@@ -16,13 +16,15 @@ public class Globals {
     private Spatial selectedSprite;
     private float globalSpeed;
     private Geometry circle;
+    private Geometry mark;
     
     public Globals(){}
     
-    public Globals(Spatial selectedSprite, float globalSpeed, Geometry circle){
+    public Globals(Spatial selectedSprite, float globalSpeed, Geometry circle, Geometry mark){
         this.selectedSprite = selectedSprite;
         this.globalSpeed = globalSpeed;
         this.circle = circle;
+        this.mark = mark;
     }
     
     public void setSelectedSprite(Spatial selectedSprite){
@@ -47,5 +49,13 @@ public class Globals {
     
     public Geometry getCircle(){
         return circle;
+    }
+    
+    public void setMark(Geometry mark){
+        this.mark = mark;
+    }
+    
+    public Geometry getMark(){
+        return mark;
     }
 }
