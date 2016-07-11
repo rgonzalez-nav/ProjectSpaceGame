@@ -5,6 +5,8 @@
  */
 package projectSpace;
 
+import com.jme3.math.Matrix3f;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -15,68 +17,67 @@ import com.jme3.scene.control.AbstractControl;
  *
  * @author rafagonz
  */
-public class SpriteMovementControl extends AbstractControl{
+public class SpriteMovementControl extends AbstractControl {
+
     private final float spriteVelocity;
     private final Globals globals;
-    
-    public SpriteMovementControl(float spriteVelocity, Globals globals){
+
+    public SpriteMovementControl(float spriteVelocity, Globals globals) {
         this.spriteVelocity = spriteVelocity;
         this.globals = globals;
     }
-    
+
     @Override
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
         spatial.setUserData("moving", false);
         spatial.setUserData("newPosition", new Vector3f(0, 0, 0));
     }
-    
+
     @Override
     protected void controlUpdate(float tpf) {
-        if(spatial.getUserData("moving")){
-            float tempX = spatial.getLocalTranslation().x;
-            float tempZ = spatial.getLocalTranslation().z;
-            float newX = ((Vector3f)spatial.getUserData("newPosition")).x;
-            float newZ = ((Vector3f)spatial.getUserData("newPosition")).z;
-            Boolean left = false;
-            Boolean up = false;
-            
+        if (spatial.getUserData("moving")) {
+            float posX = spatial.getLocalTranslation().x;
+            float posZ = spatial.getLocalTranslation().z;
+            float newPosX = ((Vector3f) spatial.getUserData("newPosition")).x;
+            float newPosZ = ((Vector3f) spatial.getUserData("newPosition")).z;
+            Boolean fowardX = false;
+            Boolean fowardZ = false;
+
             //decide movement increment and direction
-            if (tempX < newX) {
-                tempX += tpf * globals.getGlobalSpeed() * spriteVelocity;
-                left = true;
-            } else if (tempX > newX) {
-                tempX -= tpf * globals.getGlobalSpeed() * spriteVelocity;
+            float movement = tpf * globals.getGlobalSpeed() * spriteVelocity;
+            if (posX < newPosX) {
+                posX += movement;
+                fowardX = true;
+            } else if (posX > newPosX) {
+                posX -= movement;
             }
-            if (tempZ < newZ) {
-                up = true;
-                tempZ += tpf * globals.getGlobalSpeed() * spriteVelocity;
-            } else if (tempZ > newZ) {
-                tempZ -= tpf * globals.getGlobalSpeed() * spriteVelocity;
+            if (posZ < newPosZ) {
+                fowardZ = true;
+                posZ += movement;
+            } else if (posZ > newPosZ) {
+                posZ -= movement;
             }
 
             //set new position
-            if(alreadyInZPoint(up, tempZ, newZ) && alreadyInXPoint(left, tempX, newX)){
+            if (isPositionInPlace(fowardX, posX, newPosX) && isPositionInPlace(fowardZ, posZ, newPosZ)) {
                 spatial.setUserData("moving", false);
-            }else{
-                spatial.setLocalTranslation(tempX, 0, tempZ);
-                if(globals.getSelectedSprite().equals(spatial)){
-                    globals.getCircle().setLocalTranslation(tempX, 0, tempZ);
+                spatial.setLocalTranslation(newPosX, 0, newPosZ);
+            } else {
+                spatial.setLocalTranslation(posX, 0, posZ);
+                if (globals.getSelectedSprite().equals(spatial)) {
+                    globals.getCircle().setLocalTranslation(posX, 0, posZ);
                 }
             }
         }
     }
-    
-    private boolean alreadyInXPoint(Boolean left, float tempX, float newX) {
-        if(left && tempX >= newX){
-            return true;
-        }else return !left && tempX <= newX;
-    }
 
-    private boolean alreadyInZPoint(Boolean up, float tempZ, float newZ) {
-        if(up && tempZ >= newZ){
+    private static boolean isPositionInPlace(boolean foward, float position, float destination) {
+        if (foward && position >= destination) {
             return true;
-        }else return !up && tempZ <= newZ;
+        } else {
+            return !foward && position <= destination;
+        }
     }
 
     @Override
