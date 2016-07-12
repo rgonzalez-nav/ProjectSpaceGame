@@ -5,7 +5,7 @@
  */
 package projectSpace;
 
-import com.jme3.math.Matrix3f;
+import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
@@ -19,8 +19,20 @@ import com.jme3.scene.control.AbstractControl;
  */
 public class SpriteMovementControl extends AbstractControl {
 
+    private static final float ADJUSTMENT_ANGLE_Y = FastMath.PI / 2;
+
+    private static boolean isPositionInPlace(boolean movingFoward, float position, float destination) {
+        if (movingFoward && position >= destination) {
+            return true;
+        } else {
+            return !movingFoward && position <= destination;
+        }
+    }
+
     private final float spriteVelocity;
     private final Globals globals;
+
+    private Vector3f destination;
 
     public SpriteMovementControl(float spriteVelocity, Globals globals) {
         this.spriteVelocity = spriteVelocity;
@@ -37,47 +49,73 @@ public class SpriteMovementControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
         if (spatial.getUserData("moving")) {
-            float posX = spatial.getLocalTranslation().x;
-            float posZ = spatial.getLocalTranslation().z;
-            float newPosX = ((Vector3f) spatial.getUserData("newPosition")).x;
-            float newPosZ = ((Vector3f) spatial.getUserData("newPosition")).z;
-            Boolean fowardX = false;
-            Boolean fowardZ = false;
+            setVariables();
+            Vector3f nextPosition = nextPosition(tpf);
+            moveSpatialTo(nextPosition);
+        }
+    }
 
-            //decide movement increment and direction
-            float movement = tpf * globals.getGlobalSpeed() * spriteVelocity;
-            if (posX < newPosX) {
-                posX += movement;
-                fowardX = true;
-            } else if (posX > newPosX) {
-                posX -= movement;
-            }
-            if (posZ < newPosZ) {
-                fowardZ = true;
-                posZ += movement;
-            } else if (posZ > newPosZ) {
-                posZ -= movement;
-            }
+    private void setVariables() {
+        destination = spatial.getUserData("newPosition");
+    }
 
-            //set new position
-            if (isPositionInPlace(fowardX, posX, newPosX) && isPositionInPlace(fowardZ, posZ, newPosZ)) {
-                spatial.setUserData("moving", false);
-                spatial.setLocalTranslation(newPosX, 0, newPosZ);
-            } else {
-                spatial.setLocalTranslation(posX, 0, posZ);
-                if (globals.getSelectedSprite().equals(spatial)) {
-                    globals.getCircle().setLocalTranslation(posX, 0, posZ);
-                }
+    private Vector3f nextPosition(float tpf) {
+        float movement = tpf * globals.getGlobalSpeed() * spriteVelocity;
+        Vector3f position = spatial.getLocalTranslation();
+        Vector3f nextPosition = position.clone();
+        
+        if (position.x < destination.x) {
+            nextPosition.x += movement;
+        } else if (position.x > destination.x) {
+            nextPosition.x -= movement;
+        }
+        if (position.z < destination.z) {
+            nextPosition.z += movement;
+        } else if (position.z > destination.z) {
+            nextPosition.z -= movement;
+        }
+        return nextPosition;
+    }
+
+    private void moveSpatialTo(Vector3f movePosition) {
+        if (isMoveInDestination(movePosition)) {
+            spatial.setUserData("moving", false);
+            spatial.setLocalTranslation(destination.x, 0, destination.z);
+        } else {
+            rotateSpatialTo(destination);
+            spatial.setLocalTranslation(movePosition);
+            if (globals.getSelectedSprite().equals(spatial)) {
+                globals.getCircle().setLocalTranslation(movePosition);
             }
         }
     }
 
-    private static boolean isPositionInPlace(boolean foward, float position, float destination) {
-        if (foward && position >= destination) {
-            return true;
-        } else {
-            return !foward && position <= destination;
+    private boolean isMoveInDestination(Vector3f movePosition) {
+        Vector3f position = spatial.getLocalTranslation();
+        boolean movingFowardX = position.x < destination.x;
+        boolean movingFowardZ = position.z < destination.z;
+        return isPositionInPlace(movingFowardX, movePosition.x, destination.x) && isPositionInPlace(movingFowardZ, movePosition.z, destination.z);
+    }
+
+    private float rotateSpatialTo(Vector3f rotatePoint) {
+        Vector3f position = spatial.getLocalTranslation();
+        float dx = rotatePoint.x - position.x;
+        float dy = rotatePoint.z - position.z;
+        float angle = rotationAngle(dx, dy);
+        angle += ADJUSTMENT_ANGLE_Y;
+        spatial.setLocalRotation(new Quaternion(new float[]{0, angle, 0}));
+        return angle;
+    }
+
+    private float rotationAngle(float opposite, float adyacent) {
+        if (adyacent == 0) {
+            return 0;
         }
+        float angle = (float) Math.atan(opposite / adyacent);
+        if (adyacent < 0) {
+            angle += FastMath.PI;
+        }
+        return angle;
     }
 
     @Override
