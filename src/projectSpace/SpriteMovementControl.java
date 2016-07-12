@@ -28,7 +28,7 @@ public class SpriteMovementControl extends AbstractControl{
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
         spatial.setUserData("moving", false);
-        spatial.setUserData("newPosition", new Vector3f(0, 0, 0));
+        spatial.setUserData("newPosition", spatial.getLocalTranslation());
     }
     
     @Override

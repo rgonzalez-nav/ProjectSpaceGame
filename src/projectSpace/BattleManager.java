@@ -6,14 +6,19 @@
 package projectSpace;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.BloomFilter;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -33,6 +38,7 @@ public class BattleManager extends SimpleApplication{
     private SpriteMovementControl shipMovementControl;
     private InputControl inputControl;
     private SkyboxGenerator generator;
+    private WeaponMovementControl weaponMovementControl;
     
     private Geometry initMark(){
         Sphere sphere = new Sphere(30, 30, 0.2f);
@@ -47,7 +53,8 @@ public class BattleManager extends SimpleApplication{
     private void initKeys(){
         inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Command", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addListener(inputControl, "Select", "Command");
+        inputManager.addMapping("Shoot", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addListener(inputControl, "Select", "Command", "Shoot");
     }
     
     private Geometry makeFloor(){
@@ -86,14 +93,14 @@ public class BattleManager extends SimpleApplication{
     
     
     private Geometry paintCircle(){
-        Box cube2Mesh = new Box( 0.5f,0.001f,0.5f);
-        Geometry circle = new Geometry("window frame", cube2Mesh);
-        Material cube2Mat = new Material(assetManager,
+        Box cubeMesh = new Box( 0.5f,0.001f,0.5f);
+        Geometry circle = new Geometry("selection circle", cubeMesh);
+        Material cubeMat = new Material(assetManager,
         "Common/MatDefs/Misc/Unshaded.j3md");
-        cube2Mat.setTexture("ColorMap", assetManager.loadTexture("Textures/blue-circle.png"));
-        cube2Mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        cubeMat.setTexture("ColorMap", assetManager.loadTexture("Textures/blue-circle.png"));
+        cubeMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
         circle.setQueueBucket(RenderQueue.Bucket.Transparent);
-        circle.setMaterial(cube2Mat);
+        circle.setMaterial(cubeMat);
         
         return circle;
     }
@@ -104,12 +111,14 @@ public class BattleManager extends SimpleApplication{
         clickables = new Node();
         sprites = new Node();
         generator = new SkyboxGenerator(assetManager, rootNode);
-        generator.createSky();
-        inputControl = new InputControl(inputManager, cam, clickables, globals, rootNode);
+        //generator.createSky();
+        inputControl = new InputControl(inputManager, cam, 
+                clickables, globals, rootNode, new Animations(assetManager));
         
         initKeys();
         globals.setMark(initMark());
         shipMovementControl = new SpriteMovementControl(2, globals);
+        weaponMovementControl = new WeaponMovementControl(2, globals);
         
         flyCam.setEnabled(false);
         inputManager.setCursorVisible(true);
@@ -130,5 +139,10 @@ public class BattleManager extends SimpleApplication{
         sun.setDirection(new Vector3f(1,0,-2).normalizeLocal());
         sun.setColor(ColorRGBA.White);
         rootNode.addLight(sun);
+        
+        FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
+        BloomFilter bloom= new BloomFilter(BloomFilter.GlowMode.Objects);        
+        fpp.addFilter(bloom);
+        viewPort.addProcessor(fpp);
     }
 }
