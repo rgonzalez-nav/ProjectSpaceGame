@@ -98,6 +98,14 @@ public class InputControl implements ActionListener{
                     }
                     rootNode.attachChild(globals.getMark());
                 }
+                if(closest.getGeometry().getName().startsWith("shuttle")){
+                    closest.getContactPoint().y=0;
+                    if(globals.getSelectedSprite()!=null){
+                        globals.getSelectedSprite().setUserData("shooting", true);
+                        globals.getSelectedSprite().setUserData("enemy", closest.getGeometry().getParent());
+                        globals.getSelectedSprite().setUserData("target", closest.getContactPoint());
+                    }
+                }
             }else{
                 rootNode.detachChild(globals.getMark());
                 rootNode.detachChild(globals.getCircle());

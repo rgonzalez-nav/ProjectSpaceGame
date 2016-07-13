@@ -6,6 +6,7 @@
 package projectSpace;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.bounding.BoundingSphere;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.KeyTrigger;
@@ -14,7 +15,6 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -35,10 +35,10 @@ public class BattleManager extends SimpleApplication{
     Node clickables;
     Node sprites;
     private Spatial ship;
-    private SpriteMovementControl shipMovementControl;
     private InputControl inputControl;
     private SkyboxGenerator generator;
     private WeaponMovementControl weaponMovementControl;
+    private Animations animations;
     
     private Geometry initMark(){
         Sphere sphere = new Sphere(30, 30, 0.2f);
@@ -85,7 +85,9 @@ public class BattleManager extends SimpleApplication{
         ship.setUserData("moving", false);
         ship.setUserData("newPosition", ship.getLocalTranslation());
         
-        ship.addControl(shipMovementControl);
+        ship.addControl(new SpriteMovementControl(3, globals));
+        
+        ship.addControl(new AttackControl(animations, 0, globals, rootNode));
         
        return ship; 
     }
@@ -111,13 +113,13 @@ public class BattleManager extends SimpleApplication{
         clickables = new Node();
         sprites = new Node();
         generator = new SkyboxGenerator(assetManager, rootNode);
+        animations = new Animations(assetManager);
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
                 clickables, globals, rootNode, new Animations(assetManager));
         
         initKeys();
         globals.setMark(initMark());
-        shipMovementControl = new SpriteMovementControl(2, globals);
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
         flyCam.setEnabled(false);
@@ -130,6 +132,9 @@ public class BattleManager extends SimpleApplication{
         cam.setRotation(new Quaternion(-0.07f, 0.92f, -0.25f, -0.27f));
         
         sprites.attachChild(loadShip());
+        Spatial enemy = loadShip();
+        enemy.setLocalTranslation(1, 0, 1);
+        sprites.attachChild(enemy);
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);

@@ -24,7 +24,7 @@ public class Animations {
     }
     
     public Geometry loadBeamAnimation(){
-        Box innerCube = new Box(1, 0.03f, 0.03f);
+        Box innerCube = new Box(0.6f, 0.03f, 0.03f);
         Geometry innerBeam = new Geometry("inner beam", innerCube);
         Material innerMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         innerMat.setColor("Color", ColorRGBA.Cyan);

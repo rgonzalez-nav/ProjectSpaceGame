@@ -5,6 +5,8 @@
  */
 package projectSpace;
 
+import com.jme3.bounding.BoundingSphere;
+import com.jme3.collision.CollisionResults;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
@@ -31,6 +33,7 @@ public class WeaponMovementControl extends AbstractControl{
         spatial.setUserData("growing", false);
         spatial.setUserData("traveling", false);
         spatial.setUserData("newPosition", spatial.getLocalTranslation());
+        spatial.setUserData("enemy", null);
     }
     
     @Override
@@ -93,6 +96,15 @@ public class WeaponMovementControl extends AbstractControl{
                 x = x + stepx;
               }
             }
+            
+            CollisionResults results = new CollisionResults();
+            spatial.getWorldBound().collideWith(((Spatial)spatial.getUserData("enemy")).getWorldBound(), results);
+            
+            if(results.size()>0){
+                spatial.setUserData("traveling", false);
+                spatial.getParent().detachChild(spatial);
+            }
+            
             
             if(alreadyInZPoint(up, z, newZ) && alreadyInXPoint(left, x, newX)){
                 spatial.setUserData("traveling", false);
