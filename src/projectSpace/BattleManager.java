@@ -57,7 +57,7 @@ public class BattleManager extends SimpleApplication{
     private Geometry makeFloor(){
         Box box = new Box(15, .2f, 15);
         Geometry floor = new Geometry("Floor", box);
-        floor.setLocalTranslation(0, -0.1f, -5);
+        floor.setLocalTranslation(0, -0.2f, -5);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setColor("Color", ColorRGBA.BlackNoAlpha);
         mat1.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
@@ -79,14 +79,20 @@ public class BattleManager extends SimpleApplication{
         return circle;
     }
     
-    /*private Spatial loadBuilding(){
-        
-    }*/
+    private Spatial loadBuilding(){
+        Spatial station = assetManager.loadModel("Models/spacestation/TARDIS-FIGR_mkIII_station.obj");
+        station.setLocalScale(0.0005f, 0.0005f, 0.0005f);
+        station.setLocalTranslation(0, 1.5f, 0);
+        station.setName("station");
+        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites));
+        return station;
+    }
 
     @Override
     public void simpleInitApp() {
         globals = new Globals();
         clickables = new Node();
+        clickables.setName("clickables");
         sprites = new Node();
         generator = new SkyboxGenerator(assetManager, rootNode);
         //generator.createSky();
@@ -104,11 +110,12 @@ public class BattleManager extends SimpleApplication{
         
         globals.setCircle(paintCircle());
         globals.setGlobalSpeed(1f);
+        globals.setWeapons(new Weapons(assetManager));
         
         cam.setLocation(new Vector3f(5, 5, 10));
         cam.setRotation(new Quaternion(-0.07f, 0.92f, -0.25f, -0.27f));
         
-        //clickables.attachChild(loadBuilding());
+        clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);

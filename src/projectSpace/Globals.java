@@ -16,6 +16,7 @@ import java.util.HashMap;
  */
 public class Globals {
     private Spatial selectedSprite;
+    private Spatial selectedBuilding;
     private float globalSpeed;
     private Geometry circle;
     private Geometry mark;
@@ -24,7 +25,10 @@ public class Globals {
     private int unitId = 0;
     private Weapons weapons;
     
-    public Globals(){}
+    public Globals(){
+        units = new HashMap<Integer, Spatial>();
+        selectedBuilding = null;
+    }
     
     public Globals(Spatial selectedSprite, float globalSpeed, Geometry circle, Geometry mark, AssetManager assetManager){
         this.selectedSprite = selectedSprite;
@@ -33,6 +37,7 @@ public class Globals {
         this.mark = mark;
         units = new HashMap<Integer, Spatial>();
         weapons = new Weapons(assetManager);
+        selectedBuilding = null;
     }
     
     public void setSelectedSprite(Spatial selectedSprite){
@@ -94,5 +99,13 @@ public class Globals {
     
     public Weapons getWeapons(){
         return weapons;
+    }
+    
+    public void setSelectedBuilding(Spatial selectedBuilding){
+        this.selectedBuilding = selectedBuilding;
+    }
+    
+    public Spatial getSelectedBuilding(){
+        return selectedBuilding;
     }
 }
