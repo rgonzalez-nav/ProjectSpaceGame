@@ -60,20 +60,18 @@ public class SpriteMovementControl extends AbstractControl {
     }
 
     private Vector3f nextPosition(float tpf) {
-        float movement = tpf * globals.getGlobalSpeed() * spriteVelocity;
         Vector3f position = spatial.getLocalTranslation();
+        float opposite = destination.z - position.z;
+        float adyacent = destination.x - position.x;
+        float hypotenuse = FastMath.sqrt(FastMath.pow(opposite, 2) + FastMath.pow(adyacent, 2));
+
+        float movement = tpf * globals.getGlobalSpeed() * spriteVelocity;
+        float dx = (adyacent * movement) / hypotenuse;
+        float dz = (opposite * movement) / hypotenuse;
+
         Vector3f nextPosition = position.clone();
-        
-        if (position.x < destination.x) {
-            nextPosition.x += movement;
-        } else if (position.x > destination.x) {
-            nextPosition.x -= movement;
-        }
-        if (position.z < destination.z) {
-            nextPosition.z += movement;
-        } else if (position.z > destination.z) {
-            nextPosition.z -= movement;
-        }
+        nextPosition.x += dx;
+        nextPosition.z += dz;
         return nextPosition;
     }
 
@@ -82,7 +80,7 @@ public class SpriteMovementControl extends AbstractControl {
             spatial.setUserData("moving", false);
             spatial.setLocalTranslation(destination.x, 0, destination.z);
         } else {
-            rotateSpatialTo(destination);
+            rotateSpatialTo(movePosition);
             spatial.setLocalTranslation(movePosition);
             if (globals.getSelectedSprite().equals(spatial)) {
                 globals.getCircle().setLocalTranslation(movePosition);
