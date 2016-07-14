@@ -5,6 +5,7 @@
  */
 package projectSpace;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
@@ -12,23 +13,17 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.control.AbstractControl;
 
 /**
  *
  * @author rafa
  */
-public class AttackControl extends AbstractControl{
-    private final Animations animations;
+public class AttackControl extends CommonControl{
     private final int weaponType;
-    private final Globals globals;
-    private final Node rootNode;
     
-    public AttackControl(Animations animations, int weaponType, Globals globals, Node rootNode){
-        this.animations = animations;
+    public AttackControl(Globals globals, AssetManager assetManager, Node rootNode, int weaponType){
+        super(globals, assetManager, rootNode);
         this.weaponType = weaponType;
-        this.globals = globals;
-        this.rootNode = rootNode;
     }
     
     @Override
@@ -42,7 +37,7 @@ public class AttackControl extends AbstractControl{
     @Override
     protected void controlUpdate(float tpf) {
         if(spatial.getUserData("shooting")){
-            Geometry beam = animations.loadBeamAnimation();
+            Geometry beam = globals.getWeapons().loadBeam();
             WeaponMovementControl beamMovementControl = new WeaponMovementControl(2, globals);
             beam.addControl(beamMovementControl);
             //beam.rotate(0, 0, 0);

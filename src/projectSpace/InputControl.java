@@ -13,7 +13,6 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 
 /**
@@ -26,16 +25,14 @@ public class InputControl implements ActionListener{
     private final Node clickables;
     private final Globals globals;
     private final Node rootNode;
-    private final Animations animations;
     
     public InputControl(InputManager inputmanager, Camera cam, 
-            Node clickables, Globals globals, Node rootNode, Animations animations){
+            Node clickables, Globals globals, Node rootNode){
         this.inputManager = inputmanager;
         this.cam = cam;
         this.clickables = clickables;
         this.globals = globals;
         this.rootNode = rootNode;
-        this.animations = animations;
     }
 
     @Override
@@ -111,17 +108,6 @@ public class InputControl implements ActionListener{
                 rootNode.detachChild(globals.getCircle());
             }
         }
-        if(name.equals("Shoot") && !isPressed){
-            Geometry beam = animations.loadBeamAnimation();
-            WeaponMovementControl beamMovementControl = new WeaponMovementControl(2, globals);
-            beam.addControl(beamMovementControl);
-            beam.rotate(0, 0, 0);
-            beam.setUserData("newPosition", new Vector3f(-7.235211f,0,0f));
-            beam.setUserData("growing", true);
-            beam.setUserData("traveling", true);
-            
-            rootNode.attachChild(beam);
-        }   
     }
     
 }

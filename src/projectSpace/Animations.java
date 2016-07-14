@@ -23,17 +23,5 @@ public class Animations {
         this.assetManager = assetManager;
     }
     
-    public Geometry loadBeamAnimation(){
-        Box innerCube = new Box(0.6f, 0.03f, 0.03f);
-        Geometry innerBeam = new Geometry("inner beam", innerCube);
-        Material innerMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        innerMat.setColor("Color", ColorRGBA.Cyan);
-        innerMat.setColor("GlowColor", ColorRGBA.Cyan);
-        innerBeam.setMaterial(innerMat);
-        
-        innerBeam.setUserData("growing", true);
-        innerBeam.setLocalScale(0.001f, 1, 1);
-        
-        return innerBeam;
-    }
+    
 }

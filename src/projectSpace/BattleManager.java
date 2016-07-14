@@ -6,7 +6,6 @@
 package projectSpace;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.bounding.BoundingSphere;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.KeyTrigger;
@@ -34,11 +33,9 @@ public class BattleManager extends SimpleApplication{
     private Globals globals;
     Node clickables;
     Node sprites;
-    private Spatial ship;
     private InputControl inputControl;
     private SkyboxGenerator generator;
     private WeaponMovementControl weaponMovementControl;
-    private Animations animations;
     
     private Geometry initMark(){
         Sphere sphere = new Sphere(30, 30, 0.2f);
@@ -69,31 +66,6 @@ public class BattleManager extends SimpleApplication{
         return floor;
     }
     
-    private Spatial loadShip(){
-        ship = assetManager.loadModel("Models/shuttle/shuttle.obj");
-        ship.setName("ship");
-        ship.scale(0.005f, 0.005f, 0.005f);
-        
-        Node shipNode = (Node)ship;
-        Geometry geo = (Geometry)shipNode.getChild(0);
-        Material shipMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        shipMat.setBoolean("UseMaterialColors",true);
-        shipMat.setColor("Diffuse",ColorRGBA.White);
-        shipMat.setColor("Specular",ColorRGBA.White);
-        shipMat.setFloat("Shininess", 64f);
-        geo.setMaterial(shipMat);
-        ship.setUserData("moving", false);
-        ship.setUserData("newPosition", ship.getLocalTranslation());
-        
-        ship.addControl(new SpriteMovementControl(3, globals));
-        
-        ship.addControl(new AttackControl(animations, 0, globals, rootNode));
-        
-       return ship; 
-    }
-    
-    
-    
     private Geometry paintCircle(){
         Box cubeMesh = new Box( 0.5f,0.001f,0.5f);
         Geometry circle = new Geometry("selection circle", cubeMesh);
@@ -106,6 +78,10 @@ public class BattleManager extends SimpleApplication{
         
         return circle;
     }
+    
+    /*private Spatial loadBuilding(){
+        
+    }*/
 
     @Override
     public void simpleInitApp() {
@@ -113,10 +89,11 @@ public class BattleManager extends SimpleApplication{
         clickables = new Node();
         sprites = new Node();
         generator = new SkyboxGenerator(assetManager, rootNode);
-        animations = new Animations(assetManager);
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
-                clickables, globals, rootNode, new Animations(assetManager));
+                clickables, globals, rootNode);
+        
+        BuildingControl builingControl =  new BuildingControl(globals, assetManager, rootNode, sprites);
         
         initKeys();
         globals.setMark(initMark());
@@ -131,10 +108,7 @@ public class BattleManager extends SimpleApplication{
         cam.setLocation(new Vector3f(5, 5, 10));
         cam.setRotation(new Quaternion(-0.07f, 0.92f, -0.25f, -0.27f));
         
-        sprites.attachChild(loadShip());
-        Spatial enemy = loadShip();
-        enemy.setLocalTranslation(1, 0, 1);
-        sprites.attachChild(enemy);
+        //clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);
