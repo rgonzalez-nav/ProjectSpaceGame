@@ -102,7 +102,7 @@ public class BattleManager extends SimpleApplication{
         globals.setMark(initMark());
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
-        flyCam.setEnabled(false);
+//        flyCam.setEnabled(false);
         inputManager.setCursorVisible(true);
         
         globals.setCircle(paintCircle());
@@ -132,8 +132,8 @@ public class BattleManager extends SimpleApplication{
 
     private void enableDebug() {
         Debug debug = new Debug(assetManager);
-        debug.showAxisArrows(rootNode, 5);
-        debug.showAxes(rootNode, 30);
         debug.showGrid(rootNode, 30);
+        debug.showAxes(rootNode, 30);
+        debug.showAxisArrows(rootNode, 5);
     }
 }

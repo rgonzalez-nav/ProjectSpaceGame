@@ -38,7 +38,7 @@ public class Debug {
     }
 
     public void showAxes(Node node, float length) {
-        length/=2;
+        length /= 2;
         Vector3f dimension = new Vector3f(length, 0, 0);
         createAxis(node, AXIS_X_NAME, X_AXIS_COLOR, dimension);
 
@@ -79,7 +79,7 @@ public class Debug {
     }
 
     public void showGrid(Node node, Integer size) {
-        Grid grid = new Grid(size, size, 1f);
+        Grid grid = new Grid(size + 1, size + 1, 1f);
         Geometry geometry = new Geometry(node.getName() + GRID_NAME, grid);
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.getAdditionalRenderState().setWireframe(true);
