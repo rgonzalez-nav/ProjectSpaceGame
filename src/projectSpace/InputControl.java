@@ -57,7 +57,6 @@ public class InputControl implements ActionListener{
                     globals.getMark().setLocalTranslation(closest.getContactPoint());
                     globals.setSelectedSprite(null);
                     globals.setSelectedBuilding(null);
-                    System.out.println("Selected position: "+closest.getContactPoint());
                     rootNode.detachChild(globals.getCircle());
                     rootNode.attachChild(globals.getMark());
                 }
@@ -65,6 +64,7 @@ public class InputControl implements ActionListener{
                     globals.getCircle().setLocalScale(1, 1, 1);
                     globals.getCircle().setLocalTranslation(place);
                     globals.setSelectedSprite(closest.getGeometry().getParent());
+                    globals.setSelectedBuilding(null);
                     rootNode.attachChild(globals.getCircle());
                     /*System.out.println("Circle moved: geometry pos: x-"+closest.getGeometry().getLocalTranslation().x+" z-"+
                             closest.getGeometry().getLocalTranslation().z+", geometry world pos: x-"+place.x+" z-"+place.z);*/
@@ -73,6 +73,7 @@ public class InputControl implements ActionListener{
                     globals.getCircle().setLocalScale(3,1,3);
                     globals.getCircle().setLocalTranslation(place);
                     globals.setSelectedBuilding(closest.getGeometry().getParent());
+                    globals.setSelectedSprite(null);
                     rootNode.attachChild(globals.getCircle());
                 }
             }else{
@@ -93,7 +94,6 @@ public class InputControl implements ActionListener{
             clickables.collideWith(ray, results);
             if(results.size()>0){
                 CollisionResult closest = results.getClosestCollision();
-                 System.out.println("The object selected is: "+closest.getGeometry().getName());
                 if(closest.getGeometry().getName().equals("Floor")){
                     closest.getContactPoint().y=0;
                     globals.getMark().setLocalTranslation(closest.getContactPoint());
