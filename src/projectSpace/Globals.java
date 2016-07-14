@@ -5,8 +5,10 @@
  */
 package projectSpace;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
+import java.util.HashMap;
 
 /**
  *
@@ -17,14 +19,20 @@ public class Globals {
     private float globalSpeed;
     private Geometry circle;
     private Geometry mark;
+    private AssetManager assetManager;
+    private HashMap<Integer, Spatial> units;
+    private int unitId = 0;
+    private Weapons weapons;
     
     public Globals(){}
     
-    public Globals(Spatial selectedSprite, float globalSpeed, Geometry circle, Geometry mark){
+    public Globals(Spatial selectedSprite, float globalSpeed, Geometry circle, Geometry mark, AssetManager assetManager){
         this.selectedSprite = selectedSprite;
         this.globalSpeed = globalSpeed;
         this.circle = circle;
         this.mark = mark;
+        units = new HashMap<Integer, Spatial>();
+        weapons = new Weapons(assetManager);
     }
     
     public void setSelectedSprite(Spatial selectedSprite){
@@ -57,5 +65,34 @@ public class Globals {
     
     public Geometry getMark(){
         return mark;
+    }
+    
+    public int addUnit(Spatial unit){
+        units.put(++unitId, unit);
+        return unitId;
+    }
+    
+    public void removeUnit(Spatial unit){
+        units.remove((Integer)unit.getUserData("unitId"));
+    }
+    
+    public HashMap getUnits(){
+        return units;
+    }
+    
+    public void setAssetManager(AssetManager assetManager){
+        this.assetManager = assetManager;
+    }
+    
+    public AssetManager assetManager(){
+        return assetManager;
+    }
+    
+    public void setWeapons(Weapons weapons){
+        this.weapons = weapons;
+    }
+    
+    public Weapons getWeapons(){
+        return weapons;
     }
 }

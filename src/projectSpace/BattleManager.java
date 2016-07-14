@@ -14,7 +14,6 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -34,8 +33,6 @@ public class BattleManager extends SimpleApplication{
     private Globals globals;
     Node clickables;
     Node sprites;
-    private Spatial ship;
-    private SpriteMovementControl shipMovementControl;
     private InputControl inputControl;
     private SkyboxGenerator generator;
     private WeaponMovementControl weaponMovementControl;
@@ -69,29 +66,6 @@ public class BattleManager extends SimpleApplication{
         return floor;
     }
     
-    private Spatial loadShip(){
-        ship = assetManager.loadModel("Models/shuttle/shuttle.obj");
-        ship.setName("ship");
-        ship.scale(0.005f, 0.005f, 0.005f);
-        
-        Node shipNode = (Node)ship;
-        Geometry geo = (Geometry)shipNode.getChild(0);
-        Material shipMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        shipMat.setBoolean("UseMaterialColors",true);
-        shipMat.setColor("Diffuse",ColorRGBA.White);
-        shipMat.setColor("Specular",ColorRGBA.White);
-        shipMat.setFloat("Shininess", 64f);
-        geo.setMaterial(shipMat);
-        ship.setUserData("moving", false);
-        ship.setUserData("newPosition", ship.getLocalTranslation());
-        
-        ship.addControl(shipMovementControl);
-        
-       return ship; 
-    }
-    
-    
-    
     private Geometry paintCircle(){
         Box cubeMesh = new Box( 0.5f,0.001f,0.5f);
         Geometry circle = new Geometry("selection circle", cubeMesh);
@@ -104,6 +78,10 @@ public class BattleManager extends SimpleApplication{
         
         return circle;
     }
+    
+    /*private Spatial loadBuilding(){
+        
+    }*/
 
     @Override
     public void simpleInitApp() {
@@ -113,11 +91,12 @@ public class BattleManager extends SimpleApplication{
         generator = new SkyboxGenerator(assetManager, rootNode);
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
-                clickables, globals, rootNode, new Animations(assetManager));
+                clickables, globals, rootNode);
+        
+        BuildingControl builingControl =  new BuildingControl(globals, assetManager, rootNode, sprites);
         
         initKeys();
         globals.setMark(initMark());
-        shipMovementControl = new SpriteMovementControl(2, globals);
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
         flyCam.setEnabled(false);
@@ -129,7 +108,7 @@ public class BattleManager extends SimpleApplication{
         cam.setLocation(new Vector3f(5, 5, 10));
         cam.setRotation(new Quaternion(-0.07f, 0.92f, -0.25f, -0.27f));
         
-        sprites.attachChild(loadShip());
+        //clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);
