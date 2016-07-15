@@ -108,10 +108,7 @@ public class BattleManager extends SimpleApplication{
         globals.setMark(initMark());
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
-        flyCam.setEnabled(false);
-        BattleCameraControl battleCamera = new BattleCameraControl(rootNode, stateManager);
-        battleCamera.setMinLimit(new Vector3f(-15f, 0, -15));
-        battleCamera.setMaxLimit(new Vector3f(15f, 15, 15));
+        initBattleCamera();
         
         globals.setCircle(paintCircle());
         globals.setGlobalSpeed(1f);        
@@ -132,6 +129,12 @@ public class BattleManager extends SimpleApplication{
         viewPort.addProcessor(fpp);
         
         enableDebug();
+    }
+
+    private void initBattleCamera() {
+        flyCam.setEnabled(false);
+        BattleCameraControl battleCamera = new BattleCameraControl(rootNode, stateManager);
+        battleCamera.setLimits(new Vector3f(-15f, 2, -15),new Vector3f(15f, 30, 15));
     }
 
     private void enableDebug() {

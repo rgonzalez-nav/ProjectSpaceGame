@@ -53,8 +53,8 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
     private boolean up = false;
     private boolean down = false;
     private float cameraVelocity = .2f;
-    private Vector3f minLimit = Vector3f.NEGATIVE_INFINITY.clone();
-    private Vector3f maxLimit = Vector3f.POSITIVE_INFINITY.clone();
+    private Vector3f inferiorLimit = Vector3f.NEGATIVE_INFINITY.clone();
+    private Vector3f superiorLimit = Vector3f.POSITIVE_INFINITY.clone();
 
     public BattleCameraControl(Node node, AppStateManager stateManager) {
         this.node = node;
@@ -67,9 +67,9 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
         setUpKeys();
     }
 
-    private void setUpSpatial(Node node1) {
+    private void setUpSpatial(Node node) {
         Box box = new Box(.1f, .1f, .1f);
-        spatial = new Geometry(node1.getName() + PLAYER_NAME, box);
+        spatial = new Geometry(node.getName() + PLAYER_NAME, box);
         Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         material.setColor("Color", ColorRGBA.Yellow);
         spatial.setMaterial(material);
@@ -98,12 +98,11 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
         this.cameraVelocity = cameraVelocity;
     }
 
-    public void setMinLimit(Vector3f minLimit) {
-        this.minLimit = minLimit;
-    }
-
-    public void setMaxLimit(Vector3f maxLimit) {
-        this.maxLimit = maxLimit;
+    public void setLimits(Vector3f inferior, Vector3f superior) {
+        this.inferiorLimit = inferior;
+        this.superiorLimit = superior;
+        chaseCamera.setMinDistance(inferiorLimit.y);
+        chaseCamera.setMaxDistance(superiorLimit.y);
     }
 
     @Override
@@ -116,7 +115,7 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
 
     private void setCameras() {
         Vector3f frontCamera = camera.getDirection().clone();
-        frontCamera.y=0;
+        frontCamera.y = 0;
         dirCamera.set(frontCamera).multLocal(cameraVelocity);
         leftCamera.set(camera.getLeft()).multLocal(cameraVelocity);
     }
@@ -124,10 +123,10 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
     protected void setMovePosition() {
         getMovement();
         Vector3f nextPosition = spatial.getLocalTranslation().add(movement);
-        if (nextPosition.x < maxLimit.x && nextPosition.x > minLimit.x) {
+        if (nextPosition.x < superiorLimit.x && nextPosition.x > inferiorLimit.x) {
             spatial.move(movement.x, 0, 0);
         }
-        if (nextPosition.z < maxLimit.z && nextPosition.z > minLimit.z) {
+        if (nextPosition.z < superiorLimit.z && nextPosition.z > inferiorLimit.z) {
             spatial.move(0, 0, movement.z);
         }
 
