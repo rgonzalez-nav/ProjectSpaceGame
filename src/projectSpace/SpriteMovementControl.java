@@ -20,43 +20,36 @@ import com.jme3.scene.control.AbstractControl;
 public class SpriteMovementControl extends AbstractControl {
 
     private static final float ADJUSTMENT_ANGLE_Y = FastMath.PI / 2;
-
-    private static boolean isPositionInPlace(boolean movingFoward, float position, float destination) {
-        if (movingFoward && position >= destination) {
-            return true;
-        } else {
-            return !movingFoward && position <= destination;
-        }
-    }
-
     private final float spriteVelocity;
     private final Globals globals;
 
     private Vector3f destination;
+    private boolean moving;
 
     public SpriteMovementControl(float spriteVelocity, Globals globals) {
         this.spriteVelocity = spriteVelocity;
         this.globals = globals;
     }
+    
+    public void move(Vector3f destination){
+        this.destination = destination;
+        this.moving = true;
+        rotateSpatialTo(destination);
+    }
 
     @Override
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
-        spatial.setUserData("moving", false);
-        spatial.setUserData("newPosition", spatial.getLocalTranslation());
+        moving = false;
+        destination = spatial.getLocalTranslation();
     }
 
     @Override
     protected void controlUpdate(float tpf) {
-        if (spatial.getUserData("moving")) {
-            setVariables();
+        if (moving) {
             Vector3f nextPosition = nextPosition(tpf);
             moveSpatialTo(nextPosition);
         }
-    }
-
-    private void setVariables() {
-        destination = spatial.getUserData("newPosition");
     }
 
     private Vector3f nextPosition(float tpf) {
@@ -79,7 +72,7 @@ public class SpriteMovementControl extends AbstractControl {
 
     private void moveSpatialTo(Vector3f movePosition) {
         if (isMoveInDestination(movePosition)) {
-            spatial.setUserData("moving", false);
+            moving = false;
             spatial.setLocalTranslation(destination.x, 0, destination.z);
         } else {
             rotateSpatialTo(destination);
@@ -116,6 +109,14 @@ public class SpriteMovementControl extends AbstractControl {
             angle += FastMath.PI;
         }
         return angle;
+    }
+    
+    private static boolean isPositionInPlace(boolean movingFoward, float position, float destination) {
+        if (movingFoward && position >= destination) {
+            return true;
+        } else {
+            return !movingFoward && position <= destination;
+        }
     }
 
     @Override
