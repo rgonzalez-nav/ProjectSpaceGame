@@ -76,11 +76,11 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
         spatial.setCullHint(Spatial.CullHint.Always);
     }
 
-    private void setUpChaseCamera(Node node1) {
+    private void setUpChaseCamera(Node node) {
         chaseCamera = new ChaseCamera(camera, spatial, inputManager);
         chaseCamera.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_MIDDLE));
         spatial.addControl(this);
-        node1.attachChild(spatial);
+        node.attachChild(spatial);
     }
 
     private void setUpKeys() {
@@ -115,7 +115,9 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
     }
 
     private void setCameras() {
-        dirCamera.set(camera.getUp()).multLocal(cameraVelocity);
+        Vector3f frontCamera = camera.getDirection().clone();
+        frontCamera.y=0;
+        dirCamera.set(frontCamera).multLocal(cameraVelocity);
         leftCamera.set(camera.getLeft()).multLocal(cameraVelocity);
     }
 
