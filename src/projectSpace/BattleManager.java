@@ -82,36 +82,42 @@ public class BattleManager extends SimpleApplication{
         return circle;
     }
     
-    /*private Spatial loadBuilding(){
-        
-    }*/
+    private Spatial loadBuilding(){
+        Spatial station = assetManager.loadModel("Models/station/TARDIS-FIGR_mkIII_station.obj");
+        station.setName("station");
+        station.setLocalScale(0.0004f, 0.0004f, 0.0004f);
+        station.setLocalTranslation(0, 1.2f, 0);
+        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites));
+        return station;
+    }
 
     @Override
     public void simpleInitApp() {
         globals = new Globals();
         clickables = new Node();
+        clickables.setName("clickables");
         sprites = new Node();
+        sprites.setName("sprites");
         generator = new SkyboxGenerator(assetManager, rootNode);
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
                 clickables, globals, rootNode);
         
-        BuildingControl builingControl =  new BuildingControl(globals, assetManager, rootNode, sprites);
-        
         initKeys();
         globals.setMark(initMark());
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
-//        flyCam.setEnabled(false);
+        flyCam.setEnabled(false);
         inputManager.setCursorVisible(true);
         
         globals.setCircle(paintCircle());
         globals.setGlobalSpeed(1f);
+        globals.setWeapons(new Weapons(assetManager));
         
         cam.setLocation(CAMERA_INITIAL_LOCATION);
         cam.lookAt(Vector3f.ZERO, cam.getUp());
         
-        //clickables.attachChild(loadBuilding());
+        clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);
