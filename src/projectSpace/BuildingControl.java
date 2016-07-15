@@ -20,6 +20,7 @@ import com.jme3.scene.Spatial;
  */
 public class BuildingControl extends CommonControl{
     private final Node sprites;
+    private float posCont = 1.5f;
     
     public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode,Node sprites){
         super(globals, assetManager, rootNode);
@@ -36,6 +37,8 @@ public class BuildingControl extends CommonControl{
         Spatial ship = assetManager.loadModel("Models/shuttle/shuttle.obj");
         ship.setName("ship");
         ship.scale(0.005f, 0.005f, 0.005f);
+        posCont += 0.5f;
+        ship.setLocalTranslation(posCont, 0, posCont);
 
         Node shipNode = (Node)ship;
         Geometry geo = (Geometry)shipNode.getChild(0);
@@ -62,6 +65,7 @@ public class BuildingControl extends CommonControl{
             Spatial ship = loadShip();
             globals.addUnit(ship);
             sprites.attachChild(ship);
+            spatial.setUserData("creating", false);
         }
     }
 

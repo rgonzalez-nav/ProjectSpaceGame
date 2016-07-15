@@ -24,12 +24,16 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
+import projectSpace.camera.BattleCameraControl;
+import projectSpace.debug.Debug;
 
 /**
  *
  * @author rafagonz
  */
 public class BattleManager extends SimpleApplication{
+    private static final Vector3f CAMERA_INITIAL_LOCATION = new Vector3f(0f, 10f, 20f);
+    
     private Globals globals;
     Node clickables;
     Node sprites;
@@ -57,7 +61,7 @@ public class BattleManager extends SimpleApplication{
     private Geometry makeFloor(){
         Box box = new Box(15, .2f, 15);
         Geometry floor = new Geometry("Floor", box);
-        floor.setLocalTranslation(0, -0.1f, -5);
+        floor.setLocalTranslation(0,-box.yExtent, 0);
         Material mat1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat1.setColor("Color", ColorRGBA.BlackNoAlpha);
         mat1.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
@@ -79,36 +83,36 @@ public class BattleManager extends SimpleApplication{
         return circle;
     }
     
-    /*private Spatial loadBuilding(){
-        
-    }*/
+    private Spatial loadBuilding(){
+        Spatial station = assetManager.loadModel("Models/station/TARDIS-FIGR_mkIII_station.obj");
+        station.setName("station");
+        station.setLocalScale(0.0004f, 0.0004f, 0.0004f);
+        station.setLocalTranslation(0, 1.2f, 0);
+        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites));
+        return station;
+    }
 
     @Override
     public void simpleInitApp() {
         globals = new Globals();
         clickables = new Node();
+        clickables.setName("clickables");
         sprites = new Node();
+        sprites.setName("sprites");
         generator = new SkyboxGenerator(assetManager, rootNode);
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
                 clickables, globals, rootNode);
         
-        BuildingControl builingControl =  new BuildingControl(globals, assetManager, rootNode, sprites);
-        
         initKeys();
         globals.setMark(initMark());
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
-        flyCam.setEnabled(false);
-        inputManager.setCursorVisible(true);
+        initBattleCamera();
         
         globals.setCircle(paintCircle());
-        globals.setGlobalSpeed(1f);
-        
-        cam.setLocation(new Vector3f(5, 5, 10));
-        cam.setRotation(new Quaternion(-0.07f, 0.92f, -0.25f, -0.27f));
-        
-        //clickables.attachChild(loadBuilding());
+        globals.setGlobalSpeed(1f);        
+        clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);
@@ -123,5 +127,20 @@ public class BattleManager extends SimpleApplication{
         BloomFilter bloom= new BloomFilter(BloomFilter.GlowMode.Objects);        
         fpp.addFilter(bloom);
         viewPort.addProcessor(fpp);
+        
+        enableDebug();
+    }
+
+    private void initBattleCamera() {
+        flyCam.setEnabled(false);
+        BattleCameraControl battleCamera = new BattleCameraControl(rootNode, stateManager);
+        battleCamera.setLimits(new Vector3f(-15f, 2, -15),new Vector3f(15f, 30, 15));
+    }
+
+    private void enableDebug() {
+        Debug debug = new Debug(assetManager);
+        debug.showGrid(rootNode, 30);
+        debug.showAxes(rootNode, 30);
+        debug.showAxisArrows(rootNode, 5);
     }
 }

@@ -49,23 +49,32 @@ public class InputControl implements ActionListener{
             clickables.collideWith(ray, results);
             if(results.size()>0){
                 CollisionResult closest = results.getClosestCollision();
-                   
+                Vector3f place = new Vector3f(closest.getGeometry().getWorldTranslation().x,
+                0, closest.getGeometry().getWorldTranslation().z);   
                 if(closest.getGeometry().getName().equals("Floor")){
                     closest.getContactPoint().y=0;
                     globals.getMark().setLocalTranslation(closest.getContactPoint());
                     globals.setSelectedSprite(null);
+                    globals.setSelectedBuilding(null);
                     System.out.println("Selected position: "+closest.getContactPoint());
                     rootNode.detachChild(globals.getCircle());
                     rootNode.attachChild(globals.getMark());
                 }
-                if(closest.getGeometry().getName().startsWith("shuttle")){
-                    Vector3f place = closest.getGeometry().getWorldTranslation();
-                    place.y=0;
+                if(closest.getGeometry().getParent().getName().equals("ship")){
+                    globals.getCircle().setLocalScale(1, 1, 1);
                     globals.getCircle().setLocalTranslation(place);
                     globals.setSelectedSprite(closest.getGeometry().getParent());
+                    globals.setSelectedBuilding(null);
                     rootNode.attachChild(globals.getCircle());
                     /*System.out.println("Circle moved: geometry pos: x-"+closest.getGeometry().getLocalTranslation().x+" z-"+
                             closest.getGeometry().getLocalTranslation().z+", geometry world pos: x-"+place.x+" z-"+place.z);*/
+                }
+                if(closest.getGeometry().getParent().getName().equals("station")){
+                    globals.getCircle().setLocalScale(3, 1, 3);
+                    globals.getCircle().setLocalTranslation(place);
+                    globals.setSelectedSprite(null);
+                    globals.setSelectedBuilding(closest.getGeometry().getParent());
+                    rootNode.attachChild(globals.getCircle());
                 }
             }else{
                 rootNode.detachChild(globals.getMark());
@@ -85,22 +94,24 @@ public class InputControl implements ActionListener{
             clickables.collideWith(ray, results);
             if(results.size()>0){
                 CollisionResult closest = results.getClosestCollision();
-                 
+                 Vector3f place = new Vector3f(closest.getGeometry().getWorldTranslation().x,
+                0, closest.getGeometry().getWorldTranslation().z);
                 if(closest.getGeometry().getName().equals("Floor")){
-                    closest.getContactPoint().y=0;
-                    globals.getMark().setLocalTranslation(closest.getContactPoint());
+                    globals.getMark().setLocalTranslation(place);
                     if(globals.getSelectedSprite()!=null){
                         globals.getSelectedSprite().setUserData("moving", true);
-                        globals.getSelectedSprite().setUserData("newPosition", closest.getContactPoint());
+                        globals.getSelectedSprite().setUserData("newPosition", place);
+                    }
+                    if(globals.getSelectedBuilding()!=null){
+                        globals.getSelectedBuilding().setUserData("creating", true);   
                     }
                     rootNode.attachChild(globals.getMark());
                 }
-                if(closest.getGeometry().getName().startsWith("shuttle")){
-                    closest.getContactPoint().y=0;
+                if(closest.getGeometry().getParent().getName().equals("ship")){
                     if(globals.getSelectedSprite()!=null){
                         globals.getSelectedSprite().setUserData("shooting", true);
                         globals.getSelectedSprite().setUserData("enemy", closest.getGeometry().getParent());
-                        globals.getSelectedSprite().setUserData("target", closest.getContactPoint());
+                        globals.getSelectedSprite().setUserData("target", place);
                     }
                 }
             }else{
