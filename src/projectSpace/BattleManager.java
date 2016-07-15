@@ -24,6 +24,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
+import projectSpace.camera.BattleCameraControl;
 import projectSpace.debug.Debug;
 
 /**
@@ -108,15 +109,12 @@ public class BattleManager extends SimpleApplication{
         weaponMovementControl = new WeaponMovementControl(2, globals);
         
         flyCam.setEnabled(false);
-        inputManager.setCursorVisible(true);
+        BattleCameraControl battleCamera = new BattleCameraControl(rootNode, stateManager);
+        battleCamera.setMinLimit(new Vector3f(-15f, 0, -15));
+        battleCamera.setMaxLimit(new Vector3f(15f, 15, 15));
         
         globals.setCircle(paintCircle());
-        globals.setGlobalSpeed(1f);
-        globals.setWeapons(new Weapons(assetManager));
-        
-        cam.setLocation(CAMERA_INITIAL_LOCATION);
-        cam.lookAt(Vector3f.ZERO, cam.getUp());
-        
+        globals.setGlobalSpeed(1f);        
         clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());
