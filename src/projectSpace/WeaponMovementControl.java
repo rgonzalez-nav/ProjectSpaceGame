@@ -56,7 +56,7 @@ public class WeaponMovementControl extends AbstractControl{
             spatial.setLocalRotation(Quaternion.ZERO);
             float currentScale = spatial.getLocalScale().x;
             spatial.setLocalScale(new Vector3f(currentScale+movementSpeed,1,1));
-            globals.getUtil().lookAt(newPosition, spatial);
+            Util.lookAt(newPosition, spatial);
             if(spatial.getLocalScale().x>1){
                 growing = false;
             }

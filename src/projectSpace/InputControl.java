@@ -14,6 +14,7 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 
 /**
  *
@@ -49,8 +50,9 @@ public class InputControl implements ActionListener{
             clickables.collideWith(ray, results);
             if(results.size()>0){
                 CollisionResult closest = results.getClosestCollision();
+                System.out.println("Contact with: "+closest.getGeometry().getName());
                 Vector3f place = new Vector3f(closest.getContactPoint().x,
-                0, closest.getContactPoint().z);   
+                0, closest.getContactPoint().z);
                 if(closest.getGeometry().getName().equals("Floor")){
                     globals.getMark().setLocalTranslation(place);
                     globals.setSelectedSprite(null);
@@ -59,24 +61,30 @@ public class InputControl implements ActionListener{
                     rootNode.detachChild(globals.getCircle());
                     rootNode.attachChild(globals.getMark());
                 }
-                if(closest.getGeometry().getParent().getName().equals("ship")){
-                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x, 
-                            0, closest.getGeometry().getParent().getLocalTranslation().z);
+                Spatial currentSprite;
+                if(Util.DEVELOPMENT){
+                    currentSprite = closest.getGeometry();
+                }else{
+                    currentSprite = closest.getGeometry().getParent();
+                }
+                if(currentSprite.getName().equals("ship")){
+                    Vector3f spriteLocation = new Vector3f(currentSprite.getLocalTranslation().x, 
+                            0, currentSprite.getLocalTranslation().z);
                     globals.getCircle().setLocalScale(1, 1, 1);
                     globals.getCircle().setLocalTranslation(spriteLocation);
-                    globals.setSelectedSprite(closest.getGeometry().getParent());
+                    globals.setSelectedSprite(currentSprite);
                     globals.setSelectedBuilding(null);
                     rootNode.attachChild(globals.getCircle());
                     /*System.out.println("Circle moved: geometry pos: x-"+closest.getGeometry().getLocalTranslation().x+" z-"+
                             closest.getGeometry().getLocalTranslation().z+", geometry world pos: x-"+place.x+" z-"+place.z);*/
                 }
-                if(closest.getGeometry().getParent().getName().equals("station")){
-                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x, 
-                            0, closest.getGeometry().getParent().getLocalTranslation().z);
+                if(currentSprite.getName().equals("station")){
+                    Vector3f spriteLocation = new Vector3f(currentSprite.getLocalTranslation().x, 
+                            0, currentSprite.getLocalTranslation().z);
                     globals.getCircle().setLocalScale(3, 1, 3);
                     globals.getCircle().setLocalTranslation(spriteLocation);
                     globals.setSelectedSprite(null);
-                    globals.setSelectedBuilding(closest.getGeometry().getParent());
+                    globals.setSelectedBuilding(currentSprite);
                     rootNode.attachChild(globals.getCircle());
                 }
             }else{
@@ -109,12 +117,19 @@ public class InputControl implements ActionListener{
                     }
                     rootNode.attachChild(globals.getMark());
                 }
-                if(closest.getGeometry().getParent().getName().equals("ship")){
-                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x, 
-                            0, closest.getGeometry().getParent().getLocalTranslation().z);
+                
+                Spatial currentSprite;
+                if(Util.DEVELOPMENT){
+                    currentSprite = closest.getGeometry();
+                }else{
+                    currentSprite = closest.getGeometry().getParent();
+                }
+                if(currentSprite.getName().equals("ship")){
+                    Vector3f spriteLocation = new Vector3f(currentSprite.getLocalTranslation().x, 
+                            0, currentSprite.getLocalTranslation().z);
                     if(globals.getSelectedSprite()!=null){
                         globals.getSelectedSprite().getControl(AttackControl.class)
-                                .attack(closest.getGeometry(), spriteLocation);
+                                .attack(currentSprite, spriteLocation);
                     }
                 }
             }else{

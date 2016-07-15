@@ -22,10 +22,12 @@ public class BuildingControl extends CommonControl{
     private final Node sprites;
     private float posCont = 1.5f;
     private boolean creating;
+    private final Models models;
     
-    public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode,Node sprites){
+    public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode, Node sprites, Models models){
         super(globals, assetManager, rootNode);
         this.sprites = sprites;
+        this.models = models;
     }
     
     @Override
@@ -39,24 +41,11 @@ public class BuildingControl extends CommonControl{
     }
     
     private Spatial loadShip(){
-        Spatial ship = assetManager.loadModel("Models/shuttle/shuttle.obj");
-        ship.setName("ship");
-        ship.scale(0.005f, 0.005f, 0.005f);
+        Spatial ship = models.loadShip();
         posCont += 0.5f;
         ship.setLocalTranslation(posCont, 0, posCont);
-
-        Node shipNode = (Node)ship;
-        Geometry geo = (Geometry)shipNode.getChild(0);
-        Material shipMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        shipMat.setBoolean("UseMaterialColors",true);
-        shipMat.setColor("Diffuse",ColorRGBA.White);
-        shipMat.setColor("Specular",ColorRGBA.White);
-        shipMat.setFloat("Shininess", 64f);
-        geo.setMaterial(shipMat);
         ship.setUserData("unitId", globals.addUnit(ship));
-
         ship.addControl(new SpriteMovementControl(3, globals));
-
         ship.addControl(new AttackControl(globals, assetManager, rootNode, 0));
             
         return ship;

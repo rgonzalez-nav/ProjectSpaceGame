@@ -39,7 +39,7 @@ public class BattleManager extends SimpleApplication{
     Node sprites;
     private InputControl inputControl;
     private SkyboxGenerator generator;
-    private WeaponMovementControl weaponMovementControl;
+    private Models models;
     
     private Geometry initMark(){
         Sphere sphere = new Sphere(30, 30, 0.2f);
@@ -84,11 +84,8 @@ public class BattleManager extends SimpleApplication{
     }
     
     private Spatial loadBuilding(){
-        Spatial station = assetManager.loadModel("Models/station/TARDIS-FIGR_mkIII_station.obj");
-        station.setName("station");
-        station.setLocalScale(0.0004f, 0.0004f, 0.0004f);
-        station.setLocalTranslation(0, 1.2f, 0);
-        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites));
+        Spatial station = models.loadStation();
+        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites, models));
         return station;
     }
 
@@ -103,10 +100,10 @@ public class BattleManager extends SimpleApplication{
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
                 clickables, globals, rootNode);
+        models = new Models(assetManager);
         
         initKeys();
         globals.setMark(initMark());
-        weaponMovementControl = new WeaponMovementControl(2, globals);
         
         initBattleCamera();
         

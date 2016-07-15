@@ -50,8 +50,8 @@ public class AttackControl extends CommonControl{
             Geometry beam = globals.getWeapons().loadBeam();
             WeaponMovementControl beamMovementControl = new WeaponMovementControl(2, globals);
             beam.addControl(beamMovementControl);
-            globals.getUtil().lookAt(target, spatial);
-            globals.getUtil().lookAt(target, beam);
+            Util.lookAt(target, spatial);
+            Util.lookAt(target, beam);
             beam.setLocalTranslation(spatial.getLocalTranslation());
             beamMovementControl.fire(enemy, target);
             rootNode.attachChild(beam);
