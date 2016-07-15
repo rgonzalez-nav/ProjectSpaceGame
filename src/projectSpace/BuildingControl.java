@@ -21,6 +21,7 @@ import com.jme3.scene.Spatial;
 public class BuildingControl extends CommonControl{
     private final Node sprites;
     private float posCont = 1.5f;
+    private boolean creating;
     
     public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode,Node sprites){
         super(globals, assetManager, rootNode);
@@ -30,7 +31,11 @@ public class BuildingControl extends CommonControl{
     @Override
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
-        spatial.setUserData("creating", false);
+        creating = false;
+    }
+    
+    public void create(){
+        creating = true;
     }
     
     private Spatial loadShip(){
@@ -48,8 +53,6 @@ public class BuildingControl extends CommonControl{
         shipMat.setColor("Specular",ColorRGBA.White);
         shipMat.setFloat("Shininess", 64f);
         geo.setMaterial(shipMat);
-        ship.setUserData("moving", false);
-        ship.setUserData("newPosition", ship.getLocalTranslation());
         ship.setUserData("unitId", globals.addUnit(ship));
 
         ship.addControl(new SpriteMovementControl(3, globals));
@@ -61,11 +64,11 @@ public class BuildingControl extends CommonControl{
 
     @Override
     protected void controlUpdate(float tpf) {
-        if(spatial.getUserData("creating")){
+        if(creating){
             Spatial ship = loadShip();
             globals.addUnit(ship);
             sprites.attachChild(ship);
-            spatial.setUserData("creating", false);
+            creating = false;
         }
     }
 

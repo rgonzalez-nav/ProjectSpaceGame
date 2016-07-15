@@ -73,7 +73,6 @@ public class SpriteMovementControl extends AbstractControl {
             moving = false;
             spatial.setLocalTranslation(destination.x, 0, destination.z);
         } else {
-            rotateSpatialTo(movePosition);
             spatial.setLocalTranslation(movePosition);
             if (globals.getSelectedSprite().equals(spatial)) {
                 globals.getCircle().setLocalTranslation(movePosition);

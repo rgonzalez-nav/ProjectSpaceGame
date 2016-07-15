@@ -111,7 +111,8 @@ public class BattleManager extends SimpleApplication{
         initBattleCamera();
         
         globals.setCircle(paintCircle());
-        globals.setGlobalSpeed(1f);        
+        globals.setGlobalSpeed(1f);
+        globals.setWeapons(new Weapons(assetManager));
         clickables.attachChild(loadBuilding());
         
         clickables.attachChild(makeFloor());

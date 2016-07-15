@@ -24,18 +24,20 @@ public class Globals {
     private HashMap<Integer, Spatial> units;
     private int unitId = 0;
     private Weapons weapons;
+    private Util util;
     
     public Globals(){
         units = new HashMap<>();
         selectedBuilding = null;
+        util = new Util();
     }
     
     public Globals(Spatial selectedSprite, float globalSpeed, Geometry circle, Geometry mark, AssetManager assetManager){
+        this();
         this.selectedSprite = selectedSprite;
         this.globalSpeed = globalSpeed;
         this.circle = circle;
         this.mark = mark;
-        units = new HashMap<>();
         weapons = new Weapons(assetManager);
     }
     
@@ -106,5 +108,13 @@ public class Globals {
     
     public Spatial getSelectedBuilding(){
         return selectedBuilding;
+    }
+    
+    public void setUtil(Util util){
+        this.util = util;
+    }
+    
+    public Util getUtil(){
+        return util;
     }
 }

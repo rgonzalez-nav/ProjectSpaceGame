@@ -49,20 +49,21 @@ public class InputControl implements ActionListener{
             clickables.collideWith(ray, results);
             if(results.size()>0){
                 CollisionResult closest = results.getClosestCollision();
-                Vector3f place = new Vector3f(closest.getGeometry().getWorldTranslation().x,
-                0, closest.getGeometry().getWorldTranslation().z);   
+                Vector3f place = new Vector3f(closest.getContactPoint().x,
+                0, closest.getContactPoint().z);   
                 if(closest.getGeometry().getName().equals("Floor")){
-                    closest.getContactPoint().y=0;
-                    globals.getMark().setLocalTranslation(closest.getContactPoint());
+                    globals.getMark().setLocalTranslation(place);
                     globals.setSelectedSprite(null);
                     globals.setSelectedBuilding(null);
-                    System.out.println("Selected position: "+closest.getContactPoint());
+                    
                     rootNode.detachChild(globals.getCircle());
                     rootNode.attachChild(globals.getMark());
                 }
                 if(closest.getGeometry().getParent().getName().equals("ship")){
+                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x, 
+                            0, closest.getGeometry().getParent().getLocalTranslation().z);
                     globals.getCircle().setLocalScale(1, 1, 1);
-                    globals.getCircle().setLocalTranslation(place);
+                    globals.getCircle().setLocalTranslation(spriteLocation);
                     globals.setSelectedSprite(closest.getGeometry().getParent());
                     globals.setSelectedBuilding(null);
                     rootNode.attachChild(globals.getCircle());
@@ -70,8 +71,10 @@ public class InputControl implements ActionListener{
                             closest.getGeometry().getLocalTranslation().z+", geometry world pos: x-"+place.x+" z-"+place.z);*/
                 }
                 if(closest.getGeometry().getParent().getName().equals("station")){
+                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x, 
+                            0, closest.getGeometry().getParent().getLocalTranslation().z);
                     globals.getCircle().setLocalScale(3, 1, 3);
-                    globals.getCircle().setLocalTranslation(place);
+                    globals.getCircle().setLocalTranslation(spriteLocation);
                     globals.setSelectedSprite(null);
                     globals.setSelectedBuilding(closest.getGeometry().getParent());
                     rootNode.attachChild(globals.getCircle());
@@ -94,24 +97,24 @@ public class InputControl implements ActionListener{
             clickables.collideWith(ray, results);
             if(results.size()>0){
                 CollisionResult closest = results.getClosestCollision();
-                 Vector3f place = new Vector3f(closest.getGeometry().getWorldTranslation().x,
-                0, closest.getGeometry().getWorldTranslation().z);
+                Vector3f place = new Vector3f(closest.getContactPoint().x,
+                    0, closest.getContactPoint().z);
                 if(closest.getGeometry().getName().equals("Floor")){
                     globals.getMark().setLocalTranslation(place);
                     if(globals.getSelectedSprite()!=null){
-                        globals.getSelectedSprite().setUserData("moving", true);
-                        globals.getSelectedSprite().setUserData("newPosition", place);
+                        globals.getSelectedSprite().getControl(SpriteMovementControl.class).move(place);
                     }
                     if(globals.getSelectedBuilding()!=null){
-                        globals.getSelectedBuilding().setUserData("creating", true);   
+                        globals.getSelectedBuilding().getControl(BuildingControl.class).create();
                     }
                     rootNode.attachChild(globals.getMark());
                 }
                 if(closest.getGeometry().getParent().getName().equals("ship")){
+                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x, 
+                            0, closest.getGeometry().getParent().getLocalTranslation().z);
                     if(globals.getSelectedSprite()!=null){
-                        globals.getSelectedSprite().setUserData("shooting", true);
-                        globals.getSelectedSprite().setUserData("enemy", closest.getGeometry().getParent());
-                        globals.getSelectedSprite().setUserData("target", place);
+                        globals.getSelectedSprite().getControl(AttackControl.class)
+                                .attack(closest.getGeometry(), spriteLocation);
                     }
                 }
             }else{

@@ -6,7 +6,8 @@
 package projectSpace;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.bounding.BoundingBox;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
@@ -20,6 +21,9 @@ import com.jme3.scene.Spatial;
  */
 public class AttackControl extends CommonControl{
     private final int weaponType;
+    private boolean shooting;
+    private Spatial enemy;
+    private Vector3f target;
     
     public AttackControl(Globals globals, AssetManager assetManager, Node rootNode, int weaponType){
         super(globals, assetManager, rootNode);
@@ -29,26 +33,30 @@ public class AttackControl extends CommonControl{
     @Override
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
-        spatial.setUserData("shooting", false);
-        spatial.setUserData("enemy", null);
-        spatial.setUserData("target", new Vector3f(0,0,0));
+        shooting = false;
+        enemy = null;
+        target = spatial.getLocalTranslation();
+    }
+    
+    public void attack(Spatial enemy, Vector3f target){
+        shooting = true;
+        this.enemy = enemy;
+        this.target = target;
     }
     
     @Override
     protected void controlUpdate(float tpf) {
-        if(spatial.getUserData("shooting")){
+        if(shooting){
             Geometry beam = globals.getWeapons().loadBeam();
             WeaponMovementControl beamMovementControl = new WeaponMovementControl(2, globals);
             beam.addControl(beamMovementControl);
-            //beam.rotate(0, 0, 0);
+            globals.getUtil().lookAt(target, spatial);
+            globals.getUtil().lookAt(target, beam);
             beam.setLocalTranslation(spatial.getLocalTranslation());
-            beam.setUserData("newPosition", spatial.getUserData("target"));
-            beam.setUserData("growing", true);
-            beam.setUserData("traveling", true);
-            beam.setUserData("enemy",spatial.getUserData("enemy"));
+            beamMovementControl.fire(enemy, target);
             rootNode.attachChild(beam);
             
-            spatial.setUserData("shooting", false);
+            shooting = false;
         }
     }
 
