@@ -17,8 +17,9 @@ import com.jme3.scene.Spatial;
 public class Util {
     //This constant could be replaced for a parameter to be received.
     private static final float ADJUSTMENT_ANGLE_Y = FastMath.PI / 2;
+    public static final boolean DEVELOPMENT = true;
     
-    public float lookAt(Vector3f rotatePoint, Spatial spatial) {
+    public static float lookAt(Vector3f rotatePoint, Spatial spatial) {
         Vector3f position = spatial.getLocalTranslation();
         float dx = rotatePoint.x - position.x;
         float dy = rotatePoint.z - position.z;

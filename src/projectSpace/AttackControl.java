@@ -47,14 +47,21 @@ public class AttackControl extends CommonControl{
     @Override
     protected void controlUpdate(float tpf) {
         if(shooting){
-            Geometry beam = globals.getWeapons().loadBeam();
-            WeaponMovementControl beamMovementControl = new WeaponMovementControl(2, globals);
-            beam.addControl(beamMovementControl);
-            globals.getUtil().lookAt(target, spatial);
-            globals.getUtil().lookAt(target, beam);
-            beam.setLocalTranslation(spatial.getLocalTranslation());
-            beamMovementControl.fire(enemy, target);
-            rootNode.attachChild(beam);
+            Geometry weapon;
+            WeaponMovementControl weaponMovementControl;
+            if(weaponType==1){
+                weapon = globals.getWeapons().loadBeam();
+                weaponMovementControl = new WeaponMovementControl(2, globals);
+            }else {
+                 weapon = globals.getWeapons().loadBullet();
+                 weaponMovementControl = new WeaponMovementControl(3, globals);
+            }
+            weapon.addControl(weaponMovementControl);
+            Util.lookAt(target, spatial);
+            Util.lookAt(target, weapon);
+            weapon.setLocalTranslation(spatial.getLocalTranslation());
+            weaponMovementControl.fire(enemy, target);
+            rootNode.attachChild(weapon);
             
             shooting = false;
         }

@@ -20,6 +20,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Box;
+import com.jme3.scene.Spatial;
 
 /**
  *
@@ -33,17 +34,19 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
     private final Node clickables;
     private final Globals globals;
     private final Node rootNode;
+    private final Node sprites;
     private Vector3f initialSelection;
     private Float elapsedTimeHoldingAction;
 
     public InputControl(InputManager inputmanager, Camera cam,
-            Node clickables, Globals globals, Node rootNode) {
+            Node clickables, Globals globals, Node rootNode, Node sprites) {
         this.inputManager = inputmanager;
         this.cam = cam;
         this.clickables = clickables;
         this.globals = globals;
         this.rootNode = rootNode;
         rootNode.addControl(this);
+        this.sprites = sprites;
     }
 
     @Override
@@ -58,6 +61,10 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
 
         if (name.equals("Command") && !isPressed) {
             commandActionReleased();
+        }
+
+        if (name.equals("Build") && !isPressed) {
+            buildActionReleased();
         }
     }
 
@@ -107,11 +114,22 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
             if (closestCollision.getGeometry().getName().equals("Floor")) {
                 setFloorMark(closestCollision);
             }
-            if (closestCollision.getGeometry().getParent().getName().equals("ship")) {
-                selectShip(closestCollision);
+            Spatial currentSprite;
+            if (Util.DEVELOPMENT) {
+                currentSprite = closestCollision.getGeometry();
+            } else {
+                currentSprite = closestCollision.getGeometry().getParent();
             }
-            if (closestCollision.getGeometry().getParent().getName().equals("station")) {
-                selectStation(closestCollision);
+
+            if (currentSprite.getName().equals("ship")) {
+                selectSprite(currentSprite);
+            }
+            if (currentSprite.getName().equals("worker")) {
+                selectSprite(currentSprite);
+            }
+
+            if (currentSprite.getName().equals("station")) {
+                selectStation(currentSprite);
             }
         } else {
             cleanSelection();
@@ -136,23 +154,23 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
         rootNode.attachChild(globals.getMark());
     }
 
-    private void selectShip(CollisionResult closestCollision) {
-        Vector3f spriteLocation = new Vector3f(closestCollision.getGeometry().getParent().getLocalTranslation().x,
-                0, closestCollision.getGeometry().getParent().getLocalTranslation().z);
+    private void selectSprite(Spatial spatial) {
+        Vector3f spriteLocation = new Vector3f(spatial.getLocalTranslation().x,
+                0, spatial.getLocalTranslation().z);
         globals.getCircle().setLocalScale(1, 1, 1);
         globals.getCircle().setLocalTranslation(spriteLocation);
-        globals.setSelectedSprite(closestCollision.getGeometry().getParent());
+        globals.setSelectedSprite(spatial);
         globals.setSelectedBuilding(null);
         rootNode.attachChild(globals.getCircle());
     }
 
-    private void selectStation(CollisionResult closestCollision) {
-        Vector3f spriteLocation = new Vector3f(closestCollision.getGeometry().getParent().getLocalTranslation().x,
-                0, closestCollision.getGeometry().getParent().getLocalTranslation().z);
+    private void selectStation(Spatial spatial) {
+        Vector3f spriteLocation = new Vector3f(spatial.getLocalTranslation().x,
+                0, spatial.getLocalTranslation().z);
         globals.getCircle().setLocalScale(3, 1, 3);
         globals.getCircle().setLocalTranslation(spriteLocation);
         globals.setSelectedSprite(null);
-        globals.setSelectedBuilding(closestCollision.getGeometry().getParent());
+        globals.setSelectedBuilding(spatial);
         rootNode.attachChild(globals.getCircle());
     }
 
@@ -172,28 +190,46 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
         if (collisions.size() > 0) {
             CollisionResult closest = collisions.getClosestCollision();
 
+            Vector3f place = new Vector3f(closest.getContactPoint().x,
+                    0, closest.getContactPoint().z);
             if (closest.getGeometry().getName().equals("Floor")) {
-                Vector3f contactPoint = new Vector3f(closest.getContactPoint().x,
-                        0, closest.getContactPoint().z);
+                globals.getMark().setLocalTranslation(place);
                 if (globals.getSelectedSprite() != null) {
-                    globals.getSelectedSprite().getControl(SpriteMovementControl.class).move(contactPoint);
+                    globals.getSelectedSprite().getControl(SpriteMovementControl.class).move(place);
                 }
                 if (globals.getSelectedBuilding() != null) {
                     globals.getSelectedBuilding().getControl(BuildingControl.class).create();
                 }
-                globals.getMark().setLocalTranslation(contactPoint);
                 rootNode.attachChild(globals.getMark());
             }
-            if (closest.getGeometry().getParent().getName().equals("ship")) {
+
+            Spatial currentSprite;
+            if (Util.DEVELOPMENT) {
+                currentSprite = closest.getGeometry();
+            } else {
+                currentSprite = closest.getGeometry().getParent();
+            }
+
+            if (sprites.hasChild(currentSprite)) {
+                Vector3f spriteLocation = new Vector3f(currentSprite.getLocalTranslation().x,
+                        0, currentSprite.getLocalTranslation().z);
                 if (globals.getSelectedSprite() != null) {
-                    Vector3f spriteLocation = new Vector3f(closest.getGeometry().getParent().getLocalTranslation().x,
-                            0, closest.getGeometry().getParent().getLocalTranslation().z);
                     globals.getSelectedSprite().getControl(AttackControl.class)
-                            .attack(closest.getGeometry(), spriteLocation);
+                            .attack(currentSprite, spriteLocation);
                 }
             }
         } else {
             cleanSelection();
+        }
+    }
+
+    private void buildActionReleased() {
+        if (globals.getSelectedSprite() != null
+                && globals.getSelectedSprite().getName().equals("worker")) {
+            Spatial currentSprite = globals.getSelectedSprite();
+            Vector3f place = new Vector3f(currentSprite.getLocalTranslation().x + 1.5f,
+                    0, currentSprite.getLocalTranslation().z + 1.5f);
+            currentSprite.getControl(WorkerControl.class).build(place);
         }
     }
 
@@ -204,7 +240,7 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
                 Vector3f contactPoint = floorContactPoint();
                 if (contactPoint != null) {
                     Box box = new Box(initialSelection, contactPoint);
-                    Geometry selectionRectangle = globals.getSelectedRectangle();
+                    Geometry selectionRectangle = globals.getSelectionRectangle();
                     selectionRectangle.setMesh(box);
                 }
             }

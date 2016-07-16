@@ -34,4 +34,17 @@ public class Weapons {
         
         return innerBeam;
     }
+    
+    public Geometry loadBullet(){
+        Box bulletCube = new Box(0.25f, 0.02f, 0.02f);
+        Geometry bullet = new Geometry("bullet", bulletCube);
+        Material bulletMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        bulletMat.setColor("Color", ColorRGBA.Yellow);
+        bulletMat.setColor("GlowColor", ColorRGBA.Yellow);
+        bullet.setMaterial(bulletMat);
+        
+        bullet.setLocalScale(0.001f, 1, 1);
+        
+        return bullet;
+    }
 }

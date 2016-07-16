@@ -40,7 +40,7 @@ public class BattleManager extends SimpleApplication{
     Node sprites;
     private InputControl inputControl;
     private SkyboxGenerator generator;
-    private WeaponMovementControl weaponMovementControl;
+    private Models models;
     
     private Geometry initMark(){
         Sphere sphere = new Sphere(30, 30, 0.2f);
@@ -55,12 +55,13 @@ public class BattleManager extends SimpleApplication{
     private void initKeys(){
         inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Command", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        inputManager.addMapping("Build", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("Shoot", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addMapping("CursorUp", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
         inputManager.addMapping("CursorDown", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
         inputManager.addMapping("CursorRight", new MouseAxisTrigger(MouseInput.AXIS_X, false));
         inputManager.addMapping("CursorLeft", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-        inputManager.addListener(inputControl, "Select", "Command", "Shoot","CursorUp", "CursorDown","CursorRight","CursorLeft");
+        inputManager.addListener(inputControl, "Select", "Command", "Shoot", "Build","CursorUp", "CursorDown","CursorRight","CursorLeft");
     }
     
     private Geometry makeFloor(){
@@ -90,12 +91,17 @@ public class BattleManager extends SimpleApplication{
     }
     
     private Spatial loadBuilding(){
-        Spatial station = assetManager.loadModel("Models/station/TARDIS-FIGR_mkIII_station.obj");
-        station.setName("station");
-        station.setLocalScale(0.0004f, 0.0004f, 0.0004f);
-        station.setLocalTranslation(0, 1.2f, 0);
-        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites));
+        Spatial station = models.loadStation();
+        station.addControl(new BuildingControl(globals, assetManager, rootNode, models));
         return station;
+    }
+    
+    private Spatial loadWorker(){
+        Spatial worker = models.loadWorker();
+        worker.addControl(new WorkerControl(globals, assetManager, rootNode, sprites, models));
+        worker.addControl(new AttackControl(globals, assetManager, rootNode, 2));
+        worker.addControl(new SpriteMovementControl(2, globals));
+        return worker;
     }
 
     @Override
@@ -108,11 +114,11 @@ public class BattleManager extends SimpleApplication{
         generator = new SkyboxGenerator(assetManager, rootNode);
         //generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
-                clickables, globals, rootNode);
+                clickables, globals, rootNode, sprites);
+        models = new Models(assetManager);
         
         initKeys();
         globals.setMark(initMark());
-        weaponMovementControl = new WeaponMovementControl(2, globals);
         
         initBattleCamera();
         
@@ -120,6 +126,7 @@ public class BattleManager extends SimpleApplication{
         globals.setGlobalSpeed(1f);
         globals.setWeapons(new Weapons(assetManager));
         clickables.attachChild(loadBuilding());
+        sprites.attachChild(loadWorker());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);
