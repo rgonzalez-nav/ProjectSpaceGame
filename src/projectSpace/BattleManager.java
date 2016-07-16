@@ -26,6 +26,7 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import projectSpace.camera.BattleCameraControl;
 import projectSpace.debug.Debug;
+import projectSpace.input.BattleInput;
 
 /**
  *
@@ -53,15 +54,15 @@ public class BattleManager extends SimpleApplication{
     }
     
     private void initKeys(){
-        inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-        inputManager.addMapping("Command", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addMapping("Build", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addMapping("Shoot", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addMapping("CursorUp", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
-        inputManager.addMapping("CursorDown", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
-        inputManager.addMapping("CursorRight", new MouseAxisTrigger(MouseInput.AXIS_X, false));
-        inputManager.addMapping("CursorLeft", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-        inputManager.addListener(inputControl, "Select", "Command", "Shoot", "Build","CursorUp", "CursorDown","CursorRight","CursorLeft");
+        inputManager.addMapping(BattleInput.SELECT, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        inputManager.addMapping(BattleInput.COMMAND, new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        inputManager.addMapping(BattleInput.BUILD, new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addMapping(BattleInput.SHOOT, new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addMapping(BattleInput.CURSOR_UP, new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        inputManager.addMapping(BattleInput.CURSOR_DOWN, new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        inputManager.addMapping(BattleInput.CURSOR_RIGHT, new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        inputManager.addMapping(BattleInput.CURSOR_LEFT, new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        inputManager.addListener(inputControl, BattleInput.INPUTS);
     }
     
     private Geometry makeFloor(){

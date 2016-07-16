@@ -21,6 +21,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.Spatial;
+import projectSpace.input.BattleInput;
 
 /**
  *
@@ -51,7 +52,7 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
-        if (name.equals("Select")) {
+        if (name.equals(BattleInput.SELECT)) {
             if (isPressed) {
                 selectActionPressed();
             } else {
@@ -59,11 +60,11 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
             }
         }
 
-        if (name.equals("Command") && !isPressed) {
+        if (name.equals(BattleInput.COMMAND) && !isPressed) {
             commandActionReleased();
         }
 
-        if (name.equals("Build") && !isPressed) {
+        if (name.equals(BattleInput.BUILD) && !isPressed) {
             buildActionReleased();
         }
     }
@@ -238,7 +239,7 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
 
     @Override
     public void onAnalog(String name, float value, float tpf) {
-        if (name.equals("CursorUp") || name.equals("CursorDown") || name.equals("CursorRight") || name.endsWith("CursorLeft")) {
+        if (name.equals(BattleInput.CURSOR_UP) || name.equals(BattleInput.CURSOR_DOWN) || name.equals(BattleInput.CURSOR_RIGHT) || name.endsWith(BattleInput.CURSOR_LEFT)) {
             if (initialSelection != null && elapsedTimeHoldingAction != null && elapsedTimeHoldingAction > MAX_ELAPSED_TIME_PER_CLICK) {
                 Vector3f contactPoint = floorContactPoint();
                 if (contactPoint != null) {
