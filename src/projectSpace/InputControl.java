@@ -180,6 +180,9 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
     }
 
     private void determineSelectedObjects() {
+        Box box = new Box(Vector3f.ZERO, Vector3f.ZERO);
+        Geometry selectionRectangle = globals.getSelectionRectangle();
+        selectionRectangle.setMesh(box);
         System.out.println("Termino la seleccion");
         initialSelection = null;
     }
@@ -236,7 +239,7 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
     @Override
     public void onAnalog(String name, float value, float tpf) {
         if (name.equals("CursorUp") || name.equals("CursorDown") || name.equals("CursorRight") || name.endsWith("CursorLeft")) {
-            if (initialSelection != null && elapsedTimeHoldingAction != null) {
+            if (initialSelection != null && elapsedTimeHoldingAction != null && elapsedTimeHoldingAction > MAX_ELAPSED_TIME_PER_CLICK) {
                 Vector3f contactPoint = floorContactPoint();
                 if (contactPoint != null) {
                     Box box = new Box(initialSelection, contactPoint);
