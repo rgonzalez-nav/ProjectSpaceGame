@@ -16,7 +16,7 @@ import com.jme3.scene.Spatial;
  *
  * @author rafagonz
  */
-public class Models {
+public class ModelLoader {
     private final boolean simpleGeometries = Util.DEVELOPMENT;
     private final String ATTACK_SHIP_URL = "Models/shuttle/shuttle.obj";
     private final String DOCK_STATION_URL = "Models/station/TARDIS-FIGR_mkIII_station.obj";
@@ -25,7 +25,7 @@ public class Models {
     private final String SIMPLE_CYLINDER_URL = "Models/simpleCylinder/cylinder.obj";
     private final AssetManager assetManager;
     
-    public Models(AssetManager assetManager){
+    public ModelLoader(AssetManager assetManager){
         this.assetManager = assetManager;
     }
     

@@ -18,10 +18,10 @@ public class WorkerControl extends CommonControl{
     private boolean constructing;
     private Vector3f place;
     private final Node sprites;
-    private final Models models;
+    private final ModelLoader models;
     
     public WorkerControl(Globals globals, AssetManager assetManager, Node rootNode, 
-            Node sprites, Models models) {
+            Node sprites, ModelLoader models) {
         super(globals, assetManager, rootNode);
         this.sprites = sprites;
         this.models = models;

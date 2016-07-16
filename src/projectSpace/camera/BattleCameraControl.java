@@ -14,17 +14,13 @@ import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
-import com.jme3.scene.shape.Box;
 
 /**
  *
@@ -32,14 +28,12 @@ import com.jme3.scene.shape.Box;
  */
 public class BattleCameraControl extends AbstractControl implements ActionListener {
 
-    private static final String PLAYER_NAME = "PlayerSpatial";
     private static final String DOWN = "Down";
     private static final String UP = "Up";
     private static final String RIGHT = "Right";
     private static final String LEFT = "Left";
 
     private ChaseCamera chaseCamera;
-    private final Node node;
     private final AssetManager assetManager;
     private final Camera camera;
     private final InputManager inputManager;
@@ -56,31 +50,22 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
     private Vector3f inferiorLimit = Vector3f.NEGATIVE_INFINITY.clone();
     private Vector3f superiorLimit = Vector3f.POSITIVE_INFINITY.clone();
 
-    public BattleCameraControl(Node node, AppStateManager stateManager) {
-        this.node = node;
+    public BattleCameraControl(AppStateManager stateManager) {
         this.camera = stateManager.getApplication().getCamera();
         this.assetManager = stateManager.getApplication().getAssetManager();
         this.inputManager = stateManager.getApplication().getInputManager();
 
-        setUpSpatial(node);
-        setUpChaseCamera(node);
         setUpKeys();
     }
 
-    private void setUpSpatial(Node node) {
-        Box box = new Box(.1f, .1f, .1f);
-        spatial = new Geometry(node.getName() + PLAYER_NAME, box);
-        Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        material.setColor("Color", ColorRGBA.Yellow);
-        spatial.setMaterial(material);
-        spatial.setCullHint(Spatial.CullHint.Always);
-    }
-
-    private void setUpChaseCamera(Node node) {
+    @Override
+    public void setSpatial(Spatial spatial) {
+        super.setSpatial(spatial);
         chaseCamera = new ChaseCamera(camera, spatial, inputManager);
         chaseCamera.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_MIDDLE));
-        spatial.addControl(this);
-        node.attachChild(spatial);
+        chaseCamera.setMinDistance(inferiorLimit.y);
+        chaseCamera.setMaxDistance(superiorLimit.y);
+        chaseCamera.setDefaultHorizontalRotation(FastMath.PI/2);
     }
 
     private void setUpKeys() {
@@ -101,8 +86,6 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
     public void setLimits(Vector3f inferior, Vector3f superior) {
         this.inferiorLimit = inferior;
         this.superiorLimit = superior;
-        chaseCamera.setMinDistance(inferiorLimit.y);
-        chaseCamera.setMaxDistance(superiorLimit.y);
     }
 
     @Override
@@ -121,7 +104,7 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
     }
 
     protected void setMovePosition() {
-        getMovement();
+        determineMovement();
         Vector3f nextPosition = spatial.getLocalTranslation().add(movement);
         if (nextPosition.x < superiorLimit.x && nextPosition.x > inferiorLimit.x) {
             spatial.move(movement.x, 0, 0);
@@ -132,8 +115,7 @@ public class BattleCameraControl extends AbstractControl implements ActionListen
 
     }
 
-    private void getMovement() {
-        //TODO:dirCamera needs to be normalized to transpose y value into x and z
+    private void determineMovement() {
         movement.set(0, 0, 0);
         if (left) {
             movement.addLocal(leftCamera);

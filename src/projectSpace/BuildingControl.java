@@ -19,9 +19,9 @@ public class BuildingControl extends CommonControl{
     private float posX;
     private float posZ;
     private boolean creating;
-    private final Models models;
+    private final ModelLoader models;
     
-    public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode, Models models){
+    public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode, ModelLoader models){
         super(globals, assetManager, rootNode);
         this.models = models;
     }

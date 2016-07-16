@@ -119,7 +119,7 @@ public class Globals {
         return selectionRectangle;
     }
 
-    void setFloor(Geometry floor) {
+    public void setFloor(Geometry floor) {
         this.floor=floor;
     }
 

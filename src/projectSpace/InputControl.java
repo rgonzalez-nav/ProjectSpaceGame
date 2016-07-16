@@ -21,7 +21,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.Spatial;
-import projectSpace.input.BattleInput;
+import projectSpace.battle.BattleInput;
 
 /**
  *
@@ -240,7 +240,7 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
     @Override
     public void onAnalog(String name, float value, float tpf) {
         if (name.equals(BattleInput.CURSOR_UP) || name.equals(BattleInput.CURSOR_DOWN) || name.equals(BattleInput.CURSOR_RIGHT) || name.endsWith(BattleInput.CURSOR_LEFT)) {
-            if (initialSelection != null && elapsedTimeHoldingAction != null && elapsedTimeHoldingAction > MAX_ELAPSED_TIME_PER_CLICK) {
+            if (initialSelection != null && elapsedTimeHoldingAction != null) {
                 Vector3f contactPoint = floorContactPoint();
                 if (contactPoint != null) {
                     Box box = new Box(initialSelection, contactPoint);
