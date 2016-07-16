@@ -25,6 +25,8 @@ public class Globals {
     private int unitId = 0;
     private Weapons weapons;
     private Util util;
+    private Geometry selectionRectangle;
+    private Geometry floor;
     
     public Globals(){
         units = new HashMap<>();
@@ -116,5 +118,21 @@ public class Globals {
     
     public Util getUtil(){
         return util;
+    }
+
+    public void setSelectionRectangle(Geometry selectionRectangle) {
+        this.selectionRectangle = selectionRectangle;
+    }
+
+    Geometry getSelectedRectangle() {
+        return selectionRectangle;
+    }
+
+    void setFloor(Geometry floor) {
+        this.floor=floor;
+    }
+
+    public Geometry getFloor() {
+        return floor;
     }
 }

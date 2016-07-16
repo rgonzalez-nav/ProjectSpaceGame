@@ -12,6 +12,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import java.util.Objects;
 
 /**
  *
@@ -30,8 +31,8 @@ public class SpriteMovementControl extends AbstractControl {
         this.spriteVelocity = spriteVelocity;
         this.globals = globals;
     }
-    
-    public void move(Vector3f destination){
+
+    public void move(Vector3f destination) {
         this.destination = destination;
         this.moving = true;
         rotateSpatialTo(destination);
@@ -74,7 +75,7 @@ public class SpriteMovementControl extends AbstractControl {
             spatial.setLocalTranslation(destination.x, 0, destination.z);
         } else {
             spatial.setLocalTranslation(movePosition);
-            if (globals.getSelectedSprite().equals(spatial)) {
+            if (Objects.equals(globals.getSelectedSprite(), spatial)) {
                 globals.getCircle().setLocalTranslation(movePosition);
             }
         }
@@ -107,7 +108,7 @@ public class SpriteMovementControl extends AbstractControl {
         }
         return angle;
     }
-    
+
     private static boolean isPositionInPlace(boolean movingFoward, float position, float destination) {
         if (movingFoward && position >= destination) {
             return true;

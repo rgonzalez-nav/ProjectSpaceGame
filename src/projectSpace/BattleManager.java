@@ -9,12 +9,12 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.BloomFilter;
@@ -33,6 +33,7 @@ import projectSpace.debug.Debug;
  */
 public class BattleManager extends SimpleApplication{
     private static final Vector3f CAMERA_INITIAL_LOCATION = new Vector3f(0f, 10f, 20f);
+    private static final String SELECTION_RECTANGLE_NAME = "SelectionRectangle";
     
     private Globals globals;
     Node clickables;
@@ -55,7 +56,11 @@ public class BattleManager extends SimpleApplication{
         inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Command", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addMapping("Shoot", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addListener(inputControl, "Select", "Command", "Shoot");
+        inputManager.addMapping("CursorUp", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        inputManager.addMapping("CursorDown", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        inputManager.addMapping("CursorRight", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        inputManager.addMapping("CursorLeft", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        inputManager.addListener(inputControl, "Select", "Command", "Shoot","CursorUp", "CursorDown","CursorRight","CursorLeft");
     }
     
     private Geometry makeFloor(){
@@ -67,6 +72,7 @@ public class BattleManager extends SimpleApplication{
         mat1.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
         floor.setMaterial(mat1);
         floor.setQueueBucket(RenderQueue.Bucket.Transparent);
+        globals.setFloor(floor);
         return floor;
     }
     
@@ -124,12 +130,29 @@ public class BattleManager extends SimpleApplication{
         sun.setColor(ColorRGBA.White);
         rootNode.addLight(sun);
         
+        initSelectionRectangle();
+        
         FilterPostProcessor fpp=new FilterPostProcessor(assetManager);
         BloomFilter bloom= new BloomFilter(BloomFilter.GlowMode.Objects);        
         fpp.addFilter(bloom);
         viewPort.addProcessor(fpp);
         
         enableDebug();
+    }
+    
+    private Geometry initSelectionRectangle() {
+  
+        Material material = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        material.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        material.setColor("Color", new ColorRGBA(255, 255, 255, 0.01f));
+        
+        Box box = new Box(Vector3f.ZERO.clone(), Vector3f.ZERO.clone());
+        Geometry geometry = new Geometry(SELECTION_RECTANGLE_NAME, box);
+        geometry.setMaterial(material);
+        geometry.setQueueBucket(RenderQueue.Bucket.Transparent);
+        rootNode.attachChild(geometry);
+        globals.setSelectionRectangle(geometry);
+        return geometry;
     }
 
     private void initBattleCamera() {
