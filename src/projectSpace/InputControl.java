@@ -26,14 +26,16 @@ public class InputControl implements ActionListener{
     private final Node clickables;
     private final Globals globals;
     private final Node rootNode;
+    private final Node sprites;
     
     public InputControl(InputManager inputmanager, Camera cam, 
-            Node clickables, Globals globals, Node rootNode){
+            Node clickables, Globals globals, Node rootNode, Node sprites){
         this.inputManager = inputmanager;
         this.cam = cam;
         this.clickables = clickables;
         this.globals = globals;
         this.rootNode = rootNode;
+        this.sprites = sprites;
     }
 
     @Override
@@ -87,6 +89,15 @@ public class InputControl implements ActionListener{
                     globals.setSelectedBuilding(currentSprite);
                     rootNode.attachChild(globals.getCircle());
                 }
+                if(currentSprite.getName().equals("worker")){
+                    Vector3f spriteLocation = new Vector3f(currentSprite.getLocalTranslation().x, 
+                            0, currentSprite.getLocalTranslation().z);
+                    globals.getCircle().setLocalScale(1, 1, 1);
+                    globals.getCircle().setLocalTranslation(spriteLocation);
+                    globals.setSelectedSprite(currentSprite);
+                    globals.setSelectedBuilding(null);
+                    rootNode.attachChild(globals.getCircle());
+                }
             }else{
                 rootNode.detachChild(globals.getMark());
                 rootNode.detachChild(globals.getCircle());
@@ -124,7 +135,8 @@ public class InputControl implements ActionListener{
                 }else{
                     currentSprite = closest.getGeometry().getParent();
                 }
-                if(currentSprite.getName().equals("ship")){
+                
+                if(sprites.hasChild(currentSprite)){
                     Vector3f spriteLocation = new Vector3f(currentSprite.getLocalTranslation().x, 
                             0, currentSprite.getLocalTranslation().z);
                     if(globals.getSelectedSprite()!=null){
@@ -135,6 +147,15 @@ public class InputControl implements ActionListener{
             }else{
                 rootNode.detachChild(globals.getMark());
                 rootNode.detachChild(globals.getCircle());
+            }
+        }
+        if(name.equals("Build") && !isPressed){
+            if(globals.getSelectedSprite()!= null && 
+                    globals.getSelectedSprite().getName().equals("worker")){
+                Spatial currentSprite = globals.getSelectedSprite();
+                Vector3f place = new Vector3f(currentSprite.getLocalTranslation().x+1.5f,
+                        0, currentSprite.getLocalTranslation().z+1.5f);
+                currentSprite.getControl(WorkerControl.class).build(place);
             }
         }
     }

@@ -11,8 +11,6 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Cylinder;
-import com.jme3.scene.shape.Sphere;
 
 /**
  *
@@ -24,6 +22,7 @@ public class Models {
     private final String DOCK_STATION_URL = "Models/station/TARDIS-FIGR_mkIII_station.obj";
     private final String SIMPLE_CONE_URL = "Models/simpleCone/cone.obj";
     private final String SIMPLE_CUBE_URL = "Models/simpleCube/cube.obj";
+    private final String SIMPLE_CYLINDER_URL = "Models/simpleCylinder/cylinder.obj";
     private final AssetManager assetManager;
     
     public Models(AssetManager assetManager){
@@ -70,5 +69,25 @@ public class Models {
         }
         
         return station;
+    }
+    
+    public Spatial loadWorker(){
+        Spatial worker;
+        if(simpleGeometries){
+            worker = assetManager.loadModel(SIMPLE_CYLINDER_URL);
+            worker.setName("worker");
+            worker.setLocalScale(0.2f, 0.2f, 0.2f);
+            worker.setLocalTranslation(-2, 0, 2);
+            Material workerMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            workerMat.setColor("Color", ColorRGBA.Blue);
+            worker.setMaterial(workerMat);
+        }else{
+            worker = assetManager.loadModel(SIMPLE_CYLINDER_URL);
+            worker.setName("wroker");
+            Material workerMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            workerMat.setColor("Color", ColorRGBA.Blue);
+            worker.setMaterial(workerMat);
+        }
+        return worker;
     }
 }

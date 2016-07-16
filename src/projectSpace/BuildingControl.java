@@ -6,11 +6,8 @@
 package projectSpace;
 
 import com.jme3.asset.AssetManager;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
@@ -19,20 +16,21 @@ import com.jme3.scene.Spatial;
  * @author rafagonz
  */
 public class BuildingControl extends CommonControl{
-    private final Node sprites;
-    private float posCont = 1.5f;
+    private float posX;
+    private float posZ;
     private boolean creating;
     private final Models models;
     
-    public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode, Node sprites, Models models){
+    public BuildingControl(Globals globals, AssetManager assetManager, Node rootNode, Models models){
         super(globals, assetManager, rootNode);
-        this.sprites = sprites;
         this.models = models;
     }
     
     @Override
     public void setSpatial(Spatial spatial) {
         super.setSpatial(spatial);
+        posX=spatial.getLocalTranslation().x+1;
+        posZ=spatial.getLocalTranslation().z+1;
         creating = false;
     }
     
@@ -42,11 +40,12 @@ public class BuildingControl extends CommonControl{
     
     private Spatial loadShip(){
         Spatial ship = models.loadShip();
-        posCont += 0.5f;
-        ship.setLocalTranslation(posCont, 0, posCont);
+        posX += 0.5f;
+        posZ += 0.5f;
+        ship.setLocalTranslation(posX, 0, posZ);
         ship.setUserData("unitId", globals.addUnit(ship));
         ship.addControl(new SpriteMovementControl(3, globals));
-        ship.addControl(new AttackControl(globals, assetManager, rootNode, 0));
+        ship.addControl(new AttackControl(globals, assetManager, rootNode, 1));
             
         return ship;
     }
@@ -56,6 +55,7 @@ public class BuildingControl extends CommonControl{
         if(creating){
             Spatial ship = loadShip();
             globals.addUnit(ship);
+            Node sprites = (Node)rootNode.getChild("sprites");
             sprites.attachChild(ship);
             creating = false;
         }

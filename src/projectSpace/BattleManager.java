@@ -54,8 +54,8 @@ public class BattleManager extends SimpleApplication{
     private void initKeys(){
         inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addMapping("Command", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addMapping("Shoot", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addListener(inputControl, "Select", "Command", "Shoot");
+        inputManager.addMapping("Build", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addListener(inputControl, "Select", "Command", "Build");
     }
     
     private Geometry makeFloor(){
@@ -85,8 +85,16 @@ public class BattleManager extends SimpleApplication{
     
     private Spatial loadBuilding(){
         Spatial station = models.loadStation();
-        station.addControl(new BuildingControl(globals, assetManager, rootNode, sprites, models));
+        station.addControl(new BuildingControl(globals, assetManager, rootNode, models));
         return station;
+    }
+    
+    private Spatial loadWorker(){
+        Spatial worker = models.loadWorker();
+        worker.addControl(new WorkerControl(globals, assetManager, rootNode, sprites, models));
+        worker.addControl(new AttackControl(globals, assetManager, rootNode, 2));
+        worker.addControl(new SpriteMovementControl(2, globals));
+        return worker;
     }
 
     @Override
@@ -97,9 +105,9 @@ public class BattleManager extends SimpleApplication{
         sprites = new Node();
         sprites.setName("sprites");
         generator = new SkyboxGenerator(assetManager, rootNode);
-        //generator.createSky();
+        generator.createSky();
         inputControl = new InputControl(inputManager, cam, 
-                clickables, globals, rootNode);
+                clickables, globals, rootNode, sprites);
         models = new Models(assetManager);
         
         initKeys();
@@ -111,6 +119,7 @@ public class BattleManager extends SimpleApplication{
         globals.setGlobalSpeed(1f);
         globals.setWeapons(new Weapons(assetManager));
         clickables.attachChild(loadBuilding());
+        sprites.attachChild(loadWorker());
         
         clickables.attachChild(makeFloor());
         clickables.attachChild(sprites);

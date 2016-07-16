@@ -12,6 +12,7 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import java.util.Objects;
 
 /**
  *
@@ -74,7 +75,7 @@ public class SpriteMovementControl extends AbstractControl {
             spatial.setLocalTranslation(destination.x, 0, destination.z);
         } else {
             spatial.setLocalTranslation(movePosition);
-            if (globals.getSelectedSprite().equals(spatial)) {
+            if (Objects.equals(globals.getSelectedSprite(), spatial)) {
                 globals.getCircle().setLocalTranslation(movePosition);
             }
         }
