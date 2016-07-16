@@ -180,6 +180,9 @@ public class InputControl extends AbstractControl implements ActionListener, Ana
     }
 
     private void determineSelectedObjects() {
+        Box box = new Box(Vector3f.ZERO,Vector3f.ZERO);
+        Geometry selectionRectangle = globals.getSelectionRectangle();
+        selectionRectangle.setMesh(box);
         System.out.println("Termino la seleccion");
         initialSelection = null;
     }
